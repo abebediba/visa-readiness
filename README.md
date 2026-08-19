@@ -57,6 +57,11 @@ npm run build      # production build
   answer gets "what a reviewer listens for" guidance, plus optional AI feedback on
   consistency and clarity when a key is configured. Never coaches scripted or untrue
   answers.
+- **Ask about my application**: instant answers computed on-device from the assessment
+  (missing documents, contradictions, weakest areas, what to fix first) plus — when a
+  key is configured — free-form questions answered *only* from the applicant's own case
+  and the cited official rules, with a source list under every answer. Approval-chance
+  questions are deliberately out of scope and say so.
 
 ## Privacy stance of this preview
 
@@ -71,8 +76,8 @@ either way. The privacy policy describes this in user-facing language.
 
 - Accounts, server storage, RLS (Phase 1 server-side) — the current store is a thin
   layer that maps 1:1 onto the planned database schema.
-- "Ask My Application" (Phase 4), admin portal & outcome tracking (Phase 5), voice
-  interview answers and localization (Phase 6).
+- Admin portal & outcome tracking (Phase 5), voice interview answers and
+  localization (Phase 6).
 
 ## Non-negotiables encoded in the product
 

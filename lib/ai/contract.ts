@@ -46,3 +46,17 @@ export type InterviewFeedback = {
 export const CONFIDENCE_REVIEW_THRESHOLD = 0.85;
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+
+export type AskRequest = {
+  routeId: string;
+  question: string;
+  /** Provenance-tagged case facts, e.g. 'document "Bank statements": finances.available_funds' */
+  facts: Record<string, string>;
+  findings: { severity: string; title: string; detail: string }[];
+};
+
+export type AskResponse = {
+  ok: true;
+  answer: string;
+  citations: { source: string; note: string }[];
+};

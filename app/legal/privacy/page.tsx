@@ -50,6 +50,11 @@ export default function PrivacyPage() {
           details to the AI provider, solely to generate the feedback shown to you. It is not
           stored.
         </li>
+        <li>
+          <strong>"Ask about my application"</strong> free-form questions send your question and
+          case details to the AI provider, solely to generate the cited answer shown to you. The
+          page's instant answers are computed on your device and send nothing.
+        </li>
       </ul>
       <p>
         If you never tap those buttons — or the operator has not configured them — nothing you
