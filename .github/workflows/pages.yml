@@ -29,9 +29,9 @@ jobs:
         run: |
           rm -rf app/api
           STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH=/visa-readiness npx next build
-      # Requires Pages to be enabled once by hand:
-      # Settings -> Pages -> Build and deployment -> Source: GitHub Actions
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
