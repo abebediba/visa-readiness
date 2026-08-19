@@ -12,7 +12,10 @@ import { RULES_VERSION } from "../rules/seed";
 import { buildFactMap } from "./facts";
 import { runChecks } from "./checks";
 
-export const ENGINE_VERSION = "0.1.0";
+export const ENGINE_VERSION = "0.2.0";
+
+/** Highest overall score still attainable while a finding of this severity is open. */
+export const SEVERITY_CAP = { critical: 55, important: 79 } as const;
 
 /**
  * Deterministic assessment. No model in the loop: same answers + documents +
@@ -149,10 +152,21 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
 
   const scored = categories.filter((c) => c.score !== null);
   const weightSum = scored.reduce((s, c) => s + c.weight, 0);
-  const overall =
+  const weighted =
     weightSum > 0
       ? Math.round(scored.reduce((s, c) => s + (c.score as number) * c.weight, 0) / weightSum)
       : 0;
+
+  // A weighted average alone lets a single critical contradiction hide behind
+  // strong categories — an application can carry a flat contradiction and still
+  // average into "Very Strong". Reviewers do not work that way: one credibility
+  // problem governs the whole case. So severity caps the headline score.
+  const cap = findings.some((f) => f.severity === "critical")
+    ? SEVERITY_CAP.critical
+    : findings.some((f) => f.severity === "important")
+      ? SEVERITY_CAP.important
+      : 100;
+  const overall = Math.min(weighted, cap);
 
   return {
     engineVersion: ENGINE_VERSION,

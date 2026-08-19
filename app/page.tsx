@@ -62,7 +62,12 @@ export default function LandingPage() {
                 Check my readiness
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
               </Link>
-              <p className="text-sm text-faint">Takes about 15 minutes</p>
+              <Link
+                href="/demo"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-6 py-3.5 text-[15px] font-medium transition-colors hover:border-border-strong"
+              >
+                See a worked example
+              </Link>
             </div>
             <p className="mt-7 text-[17px] leading-relaxed text-muted">
               Runs entirely on your device — nothing you enter leaves it.

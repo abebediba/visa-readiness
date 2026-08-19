@@ -7,6 +7,7 @@ import { useApp } from "@/lib/store";
 import { EmptyApplication, ScoreBar, useHydrated } from "@/components/ui";
 import { Timeline } from "@/components/timeline";
 import { RouteBadge } from "@/components/flag";
+import { DemoBanner } from "@/components/demo-banner";
 import type { CountryCode } from "@/components/flag";
 
 export default function ApplicationDashboard() {
@@ -54,6 +55,7 @@ export default function ApplicationDashboard() {
 
   return (
     <div className="space-y-6">
+      <DemoBanner />
       <header className="space-y-3">
         <RouteBadge
           country={route.country as CountryCode}

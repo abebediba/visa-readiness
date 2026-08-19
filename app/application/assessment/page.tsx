@@ -9,6 +9,7 @@ import { useApp } from "@/lib/store";
 import type { CategoryScore } from "@/lib/types";
 import { EmptyApplication, ScoreBar, SeverityBadge, useHydrated } from "@/components/ui";
 import { Flag, type CountryCode } from "@/components/flag";
+import { DemoBanner } from "@/components/demo-banner";
 
 export default function AssessmentPage() {
   const hydrated = useHydrated();
@@ -26,6 +27,7 @@ export default function AssessmentPage() {
 
   return (
     <div className="space-y-6">
+      <DemoBanner />
       <header className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Visa Readiness</h1>

@@ -165,10 +165,39 @@ test("every route assesses an empty application without crashing and scores 0-10
   }
 });
 
-test("category weights are explainable: overall is the weighted mean of scored categories", () => {
+test("category weights are explainable: overall is the capped weighted mean", () => {
   const result = assess(makeApp("UK_VISITOR", { "trip.duration_days": "10" }));
   const scored = result.categories.filter((c) => c.score !== null);
   const weightSum = scored.reduce((s, c) => s + c.weight, 0);
-  const expected = Math.round(scored.reduce((s, c) => s + (c.score as number) * c.weight, 0) / weightSum);
-  assert.equal(result.overall, expected);
+  const weighted = Math.round(
+    scored.reduce((s, c) => s + (c.score as number) * c.weight, 0) / weightSum
+  );
+  const cap = result.findings.some((f) => f.severity === "critical")
+    ? 55
+    : result.findings.some((f) => f.severity === "important")
+      ? 79
+      : 100;
+  assert.equal(result.overall, Math.min(weighted, cap));
+});
+
+test("an open critical finding caps the headline score", () => {
+  const app = makeApp(
+    "US_B1B2",
+    { "us.has_relatives": false, "trip.accommodation": "host" },
+    [doc("invitation_letter", { "invitation.relationship": "sibling" })]
+  );
+  const result = assess(app);
+  assert.ok(
+    result.findings.some((f) => f.severity === "critical"),
+    "fixture has a critical finding"
+  );
+  assert.ok(result.overall <= 55, `critical case scored ${result.overall}, expected <= 55`);
+  assert.ok(result.band === "Significant Weaknesses" || result.band === "Not Submission Ready");
+});
+
+test("an important finding keeps the score out of the 'very strong' band", () => {
+  const app = makeApp("US_B1B2", { "finances.large_recent_deposit": true });
+  const result = assess(app);
+  assert.ok(result.findings.some((f) => f.severity === "important"));
+  assert.ok(result.overall <= 79, `important case scored ${result.overall}, expected <= 79`);
 });

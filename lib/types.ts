@@ -172,6 +172,8 @@ export type Application = {
   history: { ranAt: string; overall: number }[];
   submittedAt?: string;
   outcome?: Outcome;
+  /** Sample application loaded from the worked example, not the user's own */
+  isDemo?: boolean;
 };
 
 export const SEVERITY_LABEL: Record<Severity, string> = {
