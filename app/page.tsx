@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileSearch, ScanSearch, ShieldCheck } from "lucide-react";
 import { ROUTES } from "@/lib/routes/definitions";
-import { Flag, type CountryCode } from "@/components/flag";
+import { RoutesBrowser } from "@/components/routes-browser";
 import { HeroGlobe } from "@/components/globe";
 
 const FEATURES = [
@@ -28,11 +28,6 @@ const FEATURES = [
 ];
 
 export default function LandingPage() {
-  const byCountry = new Map<string, typeof ROUTES>();
-  for (const route of ROUTES) {
-    byCountry.set(route.countryName, [...(byCountry.get(route.countryName) ?? []), route]);
-  }
-
   return (
     <div data-wide className="space-y-24 pb-8 sm:space-y-32">
       {/* ---------- Hero ---------- */}
@@ -101,37 +96,8 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="max-w-2xl space-y-8">
-          {[...byCountry.entries()].map(([countryName, routes]) => (
-            <div key={countryName}>
-              <div className="flex items-center gap-2.5 px-1 pb-3">
-                <Flag country={routes[0].country as CountryCode} className="h-4 w-6" />
-                <h3 className="text-sm font-medium uppercase tracking-[0.08em] text-muted">
-                  {countryName}
-                </h3>
-              </div>
-              <ul className="card divide-y divide-border overflow-hidden">
-                {routes.map((route) => (
-                  <li key={route.id}>
-                    <Link
-                      href="/start"
-                      className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2/60"
-                    >
-                      <Flag country={route.country as CountryCode} className="h-5 w-7" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-medium">{route.shortName}</span>
-                        <span className="mt-0.5 block text-sm text-muted">{route.tagline}</span>
-                      </span>
-                      <ArrowRight
-                        className="h-4 w-4 shrink-0 text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand"
-                        aria-hidden
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="max-w-2xl">
+          <RoutesBrowser />
         </div>
       </section>
 

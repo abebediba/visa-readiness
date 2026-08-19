@@ -26,17 +26,34 @@ type Place = {
   lng: number;
   /** Destinations the product actually assesses today */
   supported?: boolean;
+  /** Kept on small screens, where the globe is too small for the full set */
+  compact?: boolean;
 };
 
 const PLACES: Place[] = [
-  { code: "US", label: "United States", lat: 38.9072, lng: -77.0369, supported: true },
-  { code: "CA", label: "Canada", lat: 45.4215, lng: -75.6972, supported: true },
-  { code: "GB", label: "United Kingdom", lat: 51.5072, lng: -0.1276, supported: true },
-  { code: "GH", label: "Ghana", lat: 5.6037, lng: -0.187 },
-  { code: "NG", label: "Nigeria", lat: 9.0765, lng: 7.3986 },
-  { code: "KE", label: "Kenya", lat: -1.2921, lng: 36.8219 },
+  // Supported destinations
+  { code: "US", label: "United States", lat: 38.9072, lng: -77.0369, supported: true, compact: true },
+  { code: "CA", label: "Canada", lat: 45.4215, lng: -75.6972, supported: true, compact: true },
+  { code: "GB", label: "United Kingdom", lat: 51.5072, lng: -0.1276, supported: true, compact: true },
+  // Africa
+  { code: "GH", label: "Ghana", lat: 5.6037, lng: -0.187, compact: true },
+  { code: "NG", label: "Nigeria", lat: 9.0765, lng: 7.3986, compact: true },
+  { code: "KE", label: "Kenya", lat: -1.2921, lng: 36.8219, compact: true },
+  { code: "SN", label: "Senegal", lat: 14.7167, lng: -17.4677 },
+  { code: "EG", label: "Egypt", lat: 30.0444, lng: 31.2357, compact: true },
+  { code: "ET", label: "Ethiopia", lat: 9.03, lng: 38.74 },
+  { code: "ZA", label: "South Africa", lat: -26.2041, lng: 28.0473, compact: true },
+  // Europe & Middle East
   { code: "CH", label: "Switzerland", lat: 46.948, lng: 7.4474 },
+  { code: "AE", label: "United Arab Emirates", lat: 25.2048, lng: 55.2708 },
+  // Asia & Pacific
+  { code: "IN", label: "India", lat: 28.6139, lng: 77.209 },
   { code: "SG", label: "Singapore", lat: 1.3521, lng: 103.8198 },
+  { code: "CN", label: "China", lat: 39.9042, lng: 116.4074 },
+  { code: "JP", label: "Japan", lat: 35.6762, lng: 139.6503 },
+  { code: "AU", label: "Australia", lat: -33.8688, lng: 151.2093 },
+  // Americas
+  { code: "BR", label: "Brazil", lat: -23.5505, lng: -46.6333 },
 ];
 
 const D2R = Math.PI / 180;
@@ -77,6 +94,7 @@ export function HeroGlobe() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const pinRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [ready, setReady] = useState(false);
+  const [dense, setDense] = useState(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,6 +109,7 @@ export function HeroGlobe() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const small = window.innerWidth < 640;
+    setDense(!small);
     const size = small ? 300 : 540;
 
     const paintPins = () => {
@@ -99,12 +118,12 @@ export function HeroGlobe() {
         if (!el) continue;
         const place = PLACES[i];
         const { x, y, z } = project(place.lat, place.lng, phi);
-        if (z <= 0.04) {
+        if (z <= 0.3) {
           el.style.opacity = "0";
           el.style.pointerEvents = "none";
         } else {
           // fade in as the pin comes round the limb
-          el.style.opacity = String(Math.min(1, z * 4));
+          el.style.opacity = String(Math.min(1, (z - 0.3) * 6));
           el.style.left = `${x * 100}%`;
           el.style.top = `${y * 100}%`;
         }
@@ -132,21 +151,6 @@ export function HeroGlobe() {
           baseColor: [0.98, 0.97, 0.96],
           markerColor: [0.06, 0.36, 0.55],
           glowColor: [0.93, 0.92, 0.89],
-          markers: PLACES.map((p) => ({
-            location: [p.lat, p.lng] as [number, number],
-            size: p.supported ? 0.045 : 0.03,
-          })),
-          arcs: small
-            ? []
-            : [
-                { from: [5.6037, -0.187] as [number, number], to: [51.5072, -0.1276] as [number, number] },
-                { from: [9.0765, 7.3986] as [number, number], to: [38.9072, -77.0369] as [number, number] },
-                { from: [-1.2921, 36.8219] as [number, number], to: [45.4215, -75.6972] as [number, number] },
-                { from: [1.3521, 103.8198] as [number, number], to: [51.5072, -0.1276] as [number, number] },
-              ],
-          arcColor: [0.16, 0.45, 0.63],
-          arcWidth: 0.32,
-          arcHeight: 0.3,
         });
         paintPins();
         setReady(true);
@@ -199,6 +203,7 @@ export function HeroGlobe() {
         {PLACES.map((place, i) => (
           <div
             key={place.code}
+            hidden={!dense && !place.compact}
             ref={(el) => {
               pinRefs.current[i] = el;
             }}
