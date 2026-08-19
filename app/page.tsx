@@ -47,11 +47,7 @@ export default function LandingPage() {
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,480px)] lg:gap-10">
           <div className="reveal relative z-10 max-w-xl">
             <h1 className="text-[2rem] font-semibold leading-[1.1] sm:text-[2.6rem] lg:text-[3rem] lg:leading-[1.06]">
-              Know how{" "}
-              <span className="bg-gradient-to-br from-brand via-teal to-accent bg-clip-text text-transparent">
-                strong
-              </span>{" "}
-              your visa application is before you submit it.
+              Know how strong your visa application is before you submit it.
             </h1>
             <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted sm:text-lg">
               Answer a guided questionnaire, list your documents, and get a transparent readiness
@@ -68,8 +64,8 @@ export default function LandingPage() {
               </Link>
               <p className="text-sm text-faint">Takes about 15 minutes</p>
             </div>
-            <p className="mt-6 text-sm text-faint">
-              Runs entirely on your device — nothing you enter leaves your phone.
+            <p className="mt-7 text-[17px] leading-relaxed text-muted">
+              Runs entirely on your device — nothing you enter leaves it.
             </p>
           </div>
 
