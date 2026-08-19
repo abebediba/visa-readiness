@@ -39,11 +39,7 @@ export default function LandingPage() {
       <section className="relative pt-6 sm:pt-12">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,480px)] lg:gap-10">
           <div className="reveal relative z-10 max-w-xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1 text-xs font-medium tracking-wide text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              Free · United States, Canada &amp; United Kingdom
-            </p>
-            <h1 className="mt-6 text-[2rem] font-semibold leading-[1.1] sm:text-[2.6rem] lg:text-[3rem] lg:leading-[1.06]">
+            <h1 className="text-[2rem] font-semibold leading-[1.1] sm:text-[2.6rem] lg:text-[3rem] lg:leading-[1.06]">
               Know how strong your visa application is before you submit it.
             </h1>
             <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted sm:text-lg">

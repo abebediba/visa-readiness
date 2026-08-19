@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { FolderOpen } from "lucide-react";
 import { CloudSync } from "@/components/cloud-sync";
+import { BackdropAmbience } from "@/components/backdrop";
 import "./globals.css";
 
 const cloudEnabled = Boolean(
@@ -23,7 +24,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">
+      <body className="relative min-h-screen antialiased">
+        <BackdropAmbience />
         <header className="no-print sticky top-0 z-30 border-b border-border/80 bg-bg/85 backdrop-blur-md">
           <div className="shell mx-auto flex h-16 w-full max-w-2xl items-center justify-between gap-4 px-4 sm:px-6">
             <Link href="/" className="flex shrink-0 items-center gap-2.5">

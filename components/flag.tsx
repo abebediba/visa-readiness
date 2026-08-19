@@ -6,7 +6,7 @@ import clsx from "clsx";
  * country cue for a large share of desktop visitors. Three simplified,
  * public-domain national designs, legible down to 16px.
  */
-export type CountryCode = "US" | "CA" | "GB";
+export type CountryCode = "US" | "CA" | "GB" | "GH" | "NG" | "KE" | "SG" | "CH";
 
 const STAR_ROWS = [0, 1, 2, 3, 4];
 const STAR_COLS = [0, 1, 2, 3, 4, 5];
@@ -59,6 +59,69 @@ function UnitedKingdom({ id }: { id: string }) {
   );
 }
 
+function Ghana() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#fcd116" />
+      <rect width="24" height="5.34" fill="#ce1126" />
+      <rect y="10.66" width="24" height="5.34" fill="#006b3f" />
+      <path d="M12 5.6 12.95 8.05 15.5 8.05 13.45 9.6 14.25 12.05 12 10.55 9.75 12.05 10.55 9.6 8.5 8.05 11.05 8.05 Z" fill="#000" />
+    </>
+  );
+}
+
+function Nigeria() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#fff" />
+      <rect width="8" height="16" fill="#008751" />
+      <rect x="16" width="8" height="16" fill="#008751" />
+    </>
+  );
+}
+
+function Kenya() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#fff" />
+      <rect width="24" height="4.6" fill="#000" />
+      <rect y="5.6" width="24" height="4.8" fill="#bb0000" />
+      <rect y="11.4" width="24" height="4.6" fill="#006600" />
+      <ellipse cx="12" cy="8" rx="2.5" ry="4.4" fill="#bb0000" stroke="#fff" strokeWidth="0.7" />
+      <ellipse cx="12" cy="8" rx="0.8" ry="2.6" fill="#fff" />
+    </>
+  );
+}
+
+function Singapore() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#fff" />
+      <rect width="24" height="8" fill="#ed2939" />
+      <path d="M8.4 4A2.9 2.9 0 1 0 8.4 9.6 3.4 3.4 0 1 1 8.4 4Z" fill="#fff" />
+      {[
+        [10.9, 3.6],
+        [12.9, 4.5],
+        [12.2, 6.6],
+        [9.6, 6.6],
+        [8.9, 4.5],
+      ].map(([cx, cy], i) => (
+        <circle key={i} cx={cx} cy={cy} r="0.5" fill="#fff" />
+      ))}
+    </>
+  );
+}
+
+function Switzerland() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#d52b1e" />
+      <rect x="10.6" y="3.6" width="2.8" height="8.8" fill="#fff" />
+      <rect x="7.6" y="6.6" width="8.8" height="2.8" fill="#fff" />
+    </>
+  );
+}
+
 export function Flag({
   country,
   className,
@@ -80,6 +143,11 @@ export function Flag({
       {country === "US" && <UnitedStates />}
       {country === "CA" && <Canada />}
       {country === "GB" && <UnitedKingdom id={clipId} />}
+      {country === "GH" && <Ghana />}
+      {country === "NG" && <Nigeria />}
+      {country === "KE" && <Kenya />}
+      {country === "SG" && <Singapore />}
+      {country === "CH" && <Switzerland />}
     </svg>
   );
 }
