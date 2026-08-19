@@ -64,7 +64,7 @@ export default function DataRightsPage() {
 
       <h2>Questions or complaints</h2>
       <p>
-        Write to <strong>privacy@[operator-domain]</strong>. You may also complain to your national
+        Write to <strong>privacy@visareadiness.com</strong>. You may also complain to your national
         data protection authority — for example the Data Protection Commission (Ghana), the Nigeria
         Data Protection Commission, the Office of the Data Protection Commissioner (Kenya), or the
         Information Regulator (South Africa).

@@ -18,9 +18,9 @@ export default function PrivacyPage() {
       <h2>1. Who is responsible for your data</h2>
       <p>
         The service is operated by the Visa Readiness project ("we"). Contact for all privacy
-        matters, including exercising your rights: <strong>privacy@[operator-domain]</strong>.
-        Before public launch this placeholder must be replaced with the registered operating
-        entity, its address, and — where required — its data protection officer.
+        matters, including exercising your rights: <strong>privacy@visareadiness.com</strong>.
+        Before public launch, the registered operating entity behind visareadiness.com, its
+        postal address, and — where required — its data protection officer must be named here.
       </p>
 
       <h2>2. What this preview version stores — and where</h2>

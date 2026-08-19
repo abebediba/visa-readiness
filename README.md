@@ -1,5 +1,7 @@
 # Visa Readiness
 
+**visareadiness.com**
+
 > **Know how strong your visa application is before you submit it.**
 
 A free tool that assesses how **complete, consistent and well-supported** a visa
@@ -91,5 +93,5 @@ either way. The privacy policy describes this in user-facing language.
 No approval probabilities, no nationality-based penalties, no fraud coaching (the
 engine's recommendations explicitly warn against borrowed funds and misstatements),
 requirements only from cited official sources, and user-controlled deletion. Before any
-public launch, replace the `[operator-domain]` contact placeholders in the legal pages
-with the real operating entity.
+public launch, name the registered operating entity in the privacy policy and terms
+(the contact addresses already point at visareadiness.com).

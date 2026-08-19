@@ -67,8 +67,8 @@ export default function TermsPage() {
       <h2>8. Changes and contact</h2>
       <p>
         We will announce material changes to these terms in the product before they take effect.
-        Questions: <strong>legal@[operator-domain]</strong> (to be replaced with the operating
-        entity's contact before public launch).
+        Questions: <strong>legal@visareadiness.com</strong>. The registered operating entity
+        behind visareadiness.com must be named here before public launch.
       </p>
     </LegalPage>
   );

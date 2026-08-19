@@ -9,10 +9,32 @@ const cloudEnabled = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://visareadiness.com";
+const DESCRIPTION =
+  "Free tool that checks how complete, consistent and well-supported your visa application looks before you submit it. Not legal advice; no approval predictions.";
+
 export const metadata: Metadata = {
-  title: "Visa Readiness — know how strong your application is before you submit it",
-  description:
-    "Free tool that checks how complete, consistent and well-supported your visa application looks before you submit it. Not legal advice; no approval predictions.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Visa Readiness — know how strong your application is before you submit it",
+    template: "%s · Visa Readiness",
+  },
+  description: DESCRIPTION,
+  applicationName: "Visa Readiness",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Visa Readiness",
+    title: "Know how strong your visa application is before you submit it",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Know how strong your visa application is before you submit it",
+    description: DESCRIPTION,
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
