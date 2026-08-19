@@ -5,17 +5,18 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Publishes the static demo to the gh-pages branch. GitHub Pages must be set to
+# "Deploy from a branch -> gh-pages -> / (root)" once in repository settings;
+# creating the Pages site itself is not permitted to the Actions token here.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,19 +30,13 @@ jobs:
         run: |
           rm -rf app/api
           STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH=/visa-readiness npx next build
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          touch out/.nojekyll
+      - name: Publish to gh-pages
+        run: |
+          cd out
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Deploy ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}" gh-pages
