@@ -28,9 +28,33 @@ export default function PrivacyPage() {
         The version you are using is a <strong>local preview</strong>. Your questionnaire answers
         and the document details you type in are stored only in your own browser's storage on your
         own device. They are not transmitted to our servers. Document files you select are read for
-        their name and size only; their contents are not uploaded anywhere. Clearing the
-        application from the settings screen, or clearing your browser data, permanently removes
-        everything.
+        their name and size only; their contents are not uploaded anywhere — with one exception you
+        control, described next. Clearing the application from the settings screen, or clearing
+        your browser data, permanently removes everything.
+      </p>
+
+      <h2>2a. Optional AI features — only when you tap the button</h2>
+      <p>
+        Where the operator has configured them, two optional AI features exist, and both are
+        strictly opt-in per use:
+      </p>
+      <ul>
+        <li>
+          <strong>"Read details with AI"</strong> on a document sends that one file to our server
+          and on to our AI provider, solely to read the fields for you. The result comes straight
+          back to your screen for review; the file is not stored by us, and every extracted value
+          must be confirmed by you before it counts.
+        </li>
+        <li>
+          <strong>Interview answer feedback</strong> sends your practice answer and your case
+          details to the AI provider, solely to generate the feedback shown to you. It is not
+          stored.
+        </li>
+      </ul>
+      <p>
+        If you never tap those buttons — or the operator has not configured them — nothing you
+        enter leaves your device. AI provider processing runs under a data processing agreement
+        that forbids training on your data.
       </p>
 
       <h2>3. What the full service will collect, and why</h2>

@@ -11,7 +11,7 @@ type State = {
   startApplication: (routeId: RouteId) => void;
   resetApplication: () => void;
   setAnswer: (id: string, value: string | boolean) => void;
-  addDocument: (doc: Omit<UploadedDoc, "id" | "addedAt" | "facts" | "factsConfirmed">) => void;
+  addDocument: (doc: Omit<UploadedDoc, "id" | "addedAt" | "facts" | "factsConfirmed">) => string | null;
   removeDocument: (id: string) => void;
   setDocumentFacts: (id: string, facts: Record<string, string>, confirmed: boolean) => void;
   runAssessmentNow: () => void;
@@ -49,7 +49,7 @@ export const useApp = create<State>()(
 
       addDocument: (doc) => {
         const app = get().application;
-        if (!app) return;
+        if (!app) return null;
         const entry: UploadedDoc = {
           ...doc,
           id: `doc_${Math.random().toString(36).slice(2, 10)}`,
@@ -58,6 +58,7 @@ export const useApp = create<State>()(
           factsConfirmed: false,
         };
         set({ application: { ...app, updatedAt: now(), documents: [...app.documents, entry] } });
+        return entry.id;
       },
 
       removeDocument: (id) => {

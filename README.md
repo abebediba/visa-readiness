@@ -45,23 +45,34 @@ npm run build      # production build
 - **Legal layer**: privacy policy, terms of service, disclaimer, and a working
   data-rights page (export everything as JSON, delete everything) — aligned with
   GDPR / Nigeria NDPA / Ghana DPA / Kenya DPA / POPIA expectations.
+- **AI document extraction (optional, opt-in per document)**: set `ANTHROPIC_API_KEY`
+  (see `.env.example`) and a "Read details with AI" button appears on each document —
+  Claude vision reads the fields with per-field confidence, low-confidence values are
+  flagged for verification, quality issues and document-type mismatches are surfaced
+  neutrally, and the user confirms everything before it counts. Without a key, manual
+  entry works exactly as before.
+- **Interview simulator (US routes)**: questions generated deterministically from the
+  applicant's *actual case* — their school, sponsor, declared refusals, and the
+  assessment's detected inconsistencies become the probes an officer would ask. Each
+  answer gets "what a reviewer listens for" guidance, plus optional AI feedback on
+  consistency and clarity when a key is configured. Never coaches scripted or untrue
+  answers.
 
 ## Privacy stance of this preview
 
-Everything runs client-side: answers and document details live only in the browser's
-localStorage; selected files are read for name/size only and never leave the device.
-There is no server, no account, no tracking. That makes the preview safe to try with
-real information — though the legal pages already describe the full architecture so the
-policies don't need rewriting at launch.
+By default everything runs client-side: answers and document details live only in the
+browser's localStorage; selected files are read for name/size only and never leave the
+device. There is no account and no tracking. The two AI features are the only exception,
+and both are strictly opt-in per use: a document is sent for reading, or a practice
+answer for feedback, only when the user taps that button — nothing is stored server-side
+either way. The privacy policy describes this in user-facing language.
 
 ## What is intentionally not built yet (see docs/PROMPT.md phases)
 
 - Accounts, server storage, RLS (Phase 1 server-side) — the current store is a thin
   layer that maps 1:1 onto the planned database schema.
-- AI document extraction (Phase 2) — replaced by the manual "enter key details" step,
-  which exercises the same fact-provenance model.
-- Interview simulator, "Ask My Application" (Phase 4), admin portal & outcome
-  tracking (Phase 5).
+- "Ask My Application" (Phase 4), admin portal & outcome tracking (Phase 5), voice
+  interview answers and localization (Phase 6).
 
 ## Non-negotiables encoded in the product
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ClipboardList, FileText, Gauge, Upload } from "lucide-react";
+import { ClipboardList, FileText, Gauge, MessageCircleQuestion, Upload } from "lucide-react";
 import { getRoute } from "@/lib/routes/definitions";
 import { useApp } from "@/lib/store";
 import { EmptyApplication, ScoreBar, useHydrated } from "@/components/ui";
@@ -102,6 +102,9 @@ export default function ApplicationDashboard() {
           { href: "/application/questionnaire", icon: ClipboardList, label: "Questionnaire" },
           { href: "/application/documents", icon: Upload, label: "Documents" },
           { href: "/application/assessment", icon: Gauge, label: "Assessment & issues" },
+          ...(route.interview
+            ? [{ href: "/application/interview", icon: MessageCircleQuestion, label: "Interview practice" }]
+            : []),
           { href: "/application/report", icon: FileText, label: "Pre-submission report" },
         ].map((item) => (
           <Link key={item.href} href={item.href} className="flex items-center gap-3 p-4 hover:bg-surface-2/60">
