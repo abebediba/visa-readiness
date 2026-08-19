@@ -62,6 +62,17 @@ export default function PrivacyPage() {
         that forbids training on your data.
       </p>
 
+      <h2>2b. Optional account &amp; cross-device sync</h2>
+      <p>
+        Where the operator has enabled accounts, you can sign in with a one-time email code to save
+        your application to your own private record and continue on another device. This is
+        optional: without signing in, everything stays on your device. What syncs is your answers,
+        the document details you confirmed, and your assessment results — <strong>never your
+        document files</strong>. Your record is protected by row-level security (only your account
+        can read or write it), and the account page has a "Delete my cloud copy" control that
+        removes it permanently, any time.
+      </p>
+
       <h2>3. What the full service will collect, and why</h2>
       <p>When account-based features launch, we will process, with your knowledge, only what the assessment needs:</p>
       <ul>

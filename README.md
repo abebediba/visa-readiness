@@ -62,6 +62,15 @@ npm run build      # production build
   key is configured — free-form questions answered *only* from the applicant's own case
   and the cited official rules, with a source list under every answer. Approval-chance
   questions are deliberately out of scope and say so.
+- **Timeline & outcome tracking**: dashboard milestones derived from real state, a
+  mark-as-submitted action that captures the readiness score at submission, and
+  voluntary decision recording.
+- **Optional accounts & cross-device sync**: configure Supabase (see
+  [`docs/SETUP-CLOUD.md`](docs/SETUP-CLOUD.md)) and users can sign in with a one-time
+  email code to save their application to their own row-level-secured record and
+  continue on another device. Answers and confirmed details sync; document files never
+  do. Includes a permanent "Delete my cloud copy" control. Without the env vars, the
+  app stays fully on-device and shows no account UI.
 
 ## Privacy stance of this preview
 
@@ -74,10 +83,8 @@ either way. The privacy policy describes this in user-facing language.
 
 ## What is intentionally not built yet (see docs/PROMPT.md phases)
 
-- Accounts, server storage, RLS (Phase 1 server-side) — the current store is a thin
-  layer that maps 1:1 onto the planned database schema.
-- Admin portal & outcome tracking (Phase 5), voice interview answers and
-  localization (Phase 6).
+- Server-side document storage (files currently stay on-device by design).
+- Admin portal (Phase 5), voice interview answers and localization (Phase 6).
 
 ## Non-negotiables encoded in the product
 

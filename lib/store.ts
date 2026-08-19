@@ -9,6 +9,7 @@ import { runAssessment } from "./engine/assess";
 type State = {
   application: Application | null;
   startApplication: (routeId: RouteId) => void;
+  loadApplication: (app: Application) => void;
   resetApplication: () => void;
   setAnswer: (id: string, value: string | boolean) => void;
   addDocument: (doc: Omit<UploadedDoc, "id" | "addedAt" | "facts" | "factsConfirmed">) => string | null;
@@ -40,6 +41,8 @@ export const useApp = create<State>()(
             history: [],
           },
         }),
+
+      loadApplication: (app) => set({ application: app }),
 
       resetApplication: () => set({ application: null }),
 

@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { CloudSync } from "@/components/cloud-sync";
 import "./globals.css";
+
+const cloudEnabled = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export const metadata: Metadata = {
   title: "Visa Readiness — know how strong your application is before you submit it",
@@ -26,12 +31,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/application" className="hover:text-text">
                 My application
               </Link>
+              {cloudEnabled && (
+                <Link href="/account" className="hover:text-text">
+                  Account
+                </Link>
+              )}
               <Link href="/start" className="rounded-full bg-brand px-3 py-1.5 text-on-brand">
                 Start
               </Link>
             </nav>
           </div>
         </header>
+        <CloudSync />
         <main className="mx-auto w-full max-w-2xl px-4 pb-24 pt-6">{children}</main>
         <footer className="no-print border-t border-border bg-surface-1">
           <div className="mx-auto max-w-2xl space-y-3 px-4 py-8 text-xs text-muted">
