@@ -54,7 +54,7 @@ export function BackdropAmbience() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       {/* warm base wash so the paper reads warm, not clinical */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_78%_-8%,rgb(15_92_140/0.10),transparent_58%),radial-gradient(90%_70%_at_-10%_45%,rgb(196_160_96/0.13),transparent_60%),radial-gradient(80%_60%_at_105%_92%,rgb(12_138_106/0.08),transparent_62%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(110%_75%_at_80%_-10%,rgb(15_92_140/0.20),transparent_55%),radial-gradient(85%_65%_at_-8%_38%,rgb(196_150_60/0.20),transparent_58%),radial-gradient(75%_60%_at_102%_88%,rgb(14_138_125/0.16),transparent_60%),radial-gradient(70%_55%_at_25%_105%,rgb(106_76_181/0.13),transparent_62%)]" />
 
       {/* engraved security line-work */}
       <svg

@@ -189,7 +189,7 @@ export function HeroGlobe() {
       ref={wrapRef}
       className="pointer-events-none relative mx-auto aspect-square w-[300px] sm:w-[420px] lg:w-[540px]"
     >
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_45%,var(--color-brand-soft),transparent_68%)]" />
+      <div className="absolute -inset-20 rounded-full bg-[radial-gradient(circle_at_34%_28%,rgb(15_92_140/0.20),transparent_58%),radial-gradient(circle_at_74%_74%,rgb(14_138_125/0.18),transparent_56%),radial-gradient(circle_at_62%_12%,rgb(196_150_60/0.15),transparent_54%)] blur-3xl" />
       <canvas
         ref={canvasRef}
         aria-hidden

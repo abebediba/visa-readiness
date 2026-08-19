@@ -66,6 +66,8 @@ export type RouteDefinition = {
   name: string;
   shortName: string;
   tagline: string;
+  /** Broad category, used for grouping and colour-coding in the UI */
+  kind: "visitor" | "study";
   sections: Section[];
   documents: DocumentTypeDef[];
   categories: CategoryDef[];

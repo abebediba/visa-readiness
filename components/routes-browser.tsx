@@ -120,8 +120,20 @@ export function RoutesBrowser() {
                   <span className="block text-xs uppercase tracking-[0.07em] text-faint">
                     {route.countryName}
                   </span>
-                  <span className="mt-0.5 block font-medium">
-                    {route.name.split("—")[1]?.trim() ?? route.shortName}
+                  <span className="mt-0.5 flex flex-wrap items-center gap-2">
+                    <span className="font-medium">
+                      {route.name.split("—")[1]?.trim() ?? route.shortName}
+                    </span>
+                    <span
+                      className={clsx(
+                        "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                        route.kind === "study"
+                          ? "bg-violet-soft text-violet"
+                          : "bg-teal-soft text-teal"
+                      )}
+                    >
+                      {route.kind === "study" ? "Study" : "Visitor"}
+                    </span>
                   </span>
                   <span className="mt-0.5 block text-sm text-muted">{route.tagline}</span>
                 </span>

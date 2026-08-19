@@ -44,6 +44,7 @@ const usRelativesSection: Section = {
 
 export const US_B1B2: RouteDefinition = {
   id: "US_B1B2",
+  kind: "visitor",
   country: "US",
   countryName: "United States",
   name: "United States — B1/B2 Visitor Visa",
@@ -94,6 +95,7 @@ export const US_B1B2: RouteDefinition = {
 
 export const US_F1: RouteDefinition = {
   id: "US_F1",
+  kind: "study",
   country: "US",
   countryName: "United States",
   name: "United States — F-1 Student Visa",
@@ -159,6 +161,7 @@ export const US_F1: RouteDefinition = {
 
 export const CA_TRV: RouteDefinition = {
   id: "CA_TRV",
+  kind: "visitor",
   country: "CA",
   countryName: "Canada",
   name: "Canada — Visitor Visa (Temporary Resident Visa)",
@@ -218,6 +221,7 @@ const caStudyExtras: Section = {
 
 export const CA_STUDY: RouteDefinition = {
   id: "CA_STUDY",
+  kind: "study",
   country: "CA",
   countryName: "Canada",
   name: "Canada — Study Permit",
@@ -282,6 +286,7 @@ export const CA_STUDY: RouteDefinition = {
 
 export const UK_VISITOR: RouteDefinition = {
   id: "UK_VISITOR",
+  kind: "visitor",
   country: "GB",
   countryName: "United Kingdom",
   name: "United Kingdom — Standard Visitor Visa",

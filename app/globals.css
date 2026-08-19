@@ -28,6 +28,18 @@
   --color-accent: #0c8a6a;
   --color-accent-soft: #e2f3ed;
 
+  /* Accent family — used to give sections and categories their own identity
+     without leaving the warm light system. Soft tints for fills, saturated
+     values for icons and text. */
+  --color-teal: #0e8a7d;
+  --color-teal-soft: #ddf2ef;
+  --color-amber: #b06f08;
+  --color-amber-soft: #fbeed8;
+  --color-violet: #6a4cb5;
+  --color-violet-soft: #ece7f9;
+  --color-rose: #b4416a;
+  --color-rose-soft: #fae5ec;
+
   /* Semantic */
   --color-pos: #0b7a5e;
   --color-warn: #a96a08;
