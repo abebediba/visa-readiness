@@ -1,74 +1,159 @@
 import Link from "next/link";
-import { CheckCircle2, FileSearch, ScanSearch, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileSearch, ScanSearch, ShieldCheck } from "lucide-react";
 import { ROUTES } from "@/lib/routes/definitions";
+import { Flag, type CountryCode } from "@/components/flag";
+import { HeroGlobe } from "@/components/globe";
+
+const FEATURES = [
+  {
+    icon: ScanSearch,
+    title: "Cross-checks everything",
+    body: "Your declared income against your employment letter against your bank statements. Your trip dates against your invitation. Contradictions surface before an officer finds them.",
+  },
+  {
+    icon: FileSearch,
+    title: "Built on official requirements",
+    body: "Every requirement links to its official government source, with the date it was last verified. Nothing is invented.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "A score you can interrogate",
+    body: "Every sub-score explains itself: what evidence counted, what weakness cost points, and what would improve it.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Honest by design",
+    body: "No approval predictions, no nationality penalties, and never advice to fake, borrow, or hide anything.",
+  },
+];
 
 export default function LandingPage() {
+  const byCountry = new Map<string, typeof ROUTES>();
+  for (const route of ROUTES) {
+    byCountry.set(route.countryName, [...(byCountry.get(route.countryName) ?? []), route]);
+  }
+
   return (
-    <div className="space-y-10">
-      <section className="space-y-4 pt-6 text-center">
-        <p className="text-xs font-medium uppercase tracking-widest text-accent">Free preview</p>
-        <h1 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-          Know how strong your visa application is — before you submit it.
-        </h1>
-        <p className="mx-auto max-w-lg text-muted">
-          Answer a guided questionnaire, list your documents, and get a transparent Visa Readiness
-          Score with the exact inconsistencies and gaps a reviewer would notice — plus what to do
-          about each one.
-        </p>
-        <div className="flex justify-center gap-3 pt-2">
-          <Link href="/start" className="rounded-full bg-brand px-6 py-3 font-medium text-on-brand">
-            Check my readiness
-          </Link>
-        </div>
-        <p className="text-xs text-faint">
-          Runs entirely on your device in this preview — nothing you enter leaves your phone.
-        </p>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2">
-        {[
-          {
-            icon: ScanSearch,
-            title: "Cross-checks everything",
-            body: "Your declared income vs your employment letter vs your bank statements. Your trip dates vs your invitation. Contradictions surface before an officer finds them.",
-          },
-          {
-            icon: FileSearch,
-            title: "Built on official requirements",
-            body: "Every requirement links to its official government source, with the date it was last verified. Nothing is invented.",
-          },
-          {
-            icon: CheckCircle2,
-            title: "A score you can interrogate",
-            body: "Every sub-score explains itself: what evidence counted, what weakness cost points, and what would improve it.",
-          },
-          {
-            icon: ShieldCheck,
-            title: "Honest by design",
-            body: "No approval predictions, no nationality penalties, and never advice to fake, borrow, or hide anything.",
-          },
-        ].map((f) => (
-          <div key={f.title} className="card space-y-2 p-5">
-            <f.icon className="h-5 w-5 text-brand" aria-hidden />
-            <h2 className="font-medium">{f.title}</h2>
-            <p className="text-sm text-muted">{f.body}</p>
+    <div data-wide className="space-y-24 pb-8 sm:space-y-32">
+      {/* ---------- Hero ---------- */}
+      <section className="relative pt-6 sm:pt-12">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,480px)] lg:gap-10">
+          <div className="reveal relative z-10 max-w-xl">
+            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1 text-xs font-medium tracking-wide text-muted">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              Free · United States, Canada &amp; United Kingdom
+            </p>
+            <h1 className="mt-6 text-[2rem] font-semibold leading-[1.1] sm:text-[2.6rem] lg:text-[3rem] lg:leading-[1.06]">
+              Know how strong your visa application is before you submit it.
+            </h1>
+            <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted sm:text-lg">
+              Answer a guided questionnaire, list your documents, and get a transparent readiness
+              score with the exact inconsistencies and gaps a reviewer would notice — and what to do
+              about each one.
+            </p>
+            <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <Link
+                href="/start"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-[15px] font-medium text-on-brand shadow-[0_1px_2px_rgb(15_92_140/0.28),0_10px_24px_-12px_rgb(15_92_140/0.65)] transition-colors hover:bg-brand-deep sm:w-auto"
+              >
+                Check my readiness
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              </Link>
+              <p className="text-sm text-faint">Takes about 15 minutes</p>
+            </div>
+            <p className="mt-6 text-sm text-faint">
+              Runs entirely on your device — nothing you enter leaves your phone.
+            </p>
           </div>
-        ))}
+
+          <div className="reveal reveal-2 relative -my-6 lg:my-0">
+            <HeroGlobe />
+          </div>
+        </div>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Supported visa routes</h2>
-        <ul className="card divide-y divide-border">
-          {ROUTES.map((r) => (
-            <li key={r.id} className="flex items-center justify-between gap-3 p-4">
-              <div>
-                <p className="font-medium">{r.name}</p>
-                <p className="text-sm text-muted">{r.tagline}</p>
-              </div>
-            </li>
+      {/* ---------- What it does ---------- */}
+      <section className="space-y-8">
+        <div className="max-w-lg">
+          <h2 className="text-2xl font-semibold sm:text-3xl">Not a checklist. A review.</h2>
+          <p className="mt-3 text-muted">
+            The same things an experienced reviewer looks for, applied to your own documents.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {FEATURES.map((feature) => (
+            <div
+              key={feature.title}
+              className="card p-6 transition-shadow duration-300 hover:shadow-[var(--shadow-card)]"
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft">
+                <feature.icon className="h-[18px] w-[18px] text-brand" aria-hidden />
+              </span>
+              <h3 className="mt-4 font-medium">{feature.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted">{feature.body}</p>
+            </div>
           ))}
-        </ul>
-        <p className="text-sm text-muted">More countries and routes are added as configuration — the platform is built for it.</p>
+        </div>
+      </section>
+
+      {/* ---------- Supported routes ---------- */}
+      <section className="space-y-8">
+        <div className="max-w-lg">
+          <h2 className="text-2xl font-semibold sm:text-3xl">Supported visa routes</h2>
+          <p className="mt-3 text-muted">
+            Five routes at launch. New countries are added as configuration, not rewrites.
+          </p>
+        </div>
+
+        <div className="max-w-2xl space-y-8">
+          {[...byCountry.entries()].map(([countryName, routes]) => (
+            <div key={countryName}>
+              <div className="flex items-center gap-2.5 px-1 pb-3">
+                <Flag country={routes[0].country as CountryCode} className="h-4 w-6" />
+                <h3 className="text-sm font-medium uppercase tracking-[0.08em] text-muted">
+                  {countryName}
+                </h3>
+              </div>
+              <ul className="card divide-y divide-border overflow-hidden">
+                {routes.map((route) => (
+                  <li key={route.id}>
+                    <Link
+                      href="/start"
+                      className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2/60"
+                    >
+                      <Flag country={route.country as CountryCode} className="h-5 w-7" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium">{route.shortName}</span>
+                        <span className="mt-0.5 block text-sm text-muted">{route.tagline}</span>
+                      </span>
+                      <ArrowRight
+                        className="h-4 w-4 shrink-0 text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand"
+                        aria-hidden
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------- Closing CTA ---------- */}
+      <section className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface-2 px-6 py-14 text-center sm:px-12">
+        <h2 className="mx-auto max-w-md text-2xl font-semibold sm:text-3xl">
+          Your application, reviewed before the embassy reviews it.
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-muted">
+          Free, private, and honest about what it can and cannot tell you.
+        </p>
+        <Link
+          href="/start"
+          className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-[15px] font-medium text-on-brand transition-colors hover:bg-brand-deep"
+        >
+          Start my application
+          <ArrowRight className="h-4 w-4" aria-hidden />
+        </Link>
       </section>
     </div>
   );

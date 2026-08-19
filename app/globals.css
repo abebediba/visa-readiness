@@ -1,76 +1,113 @@
 @import "tailwindcss";
 
+/* Visa Readiness — warm light system.
+   Committed to a light palette: no prefers-color-scheme override, so the
+   design is identical for every visitor regardless of device theme. */
 @theme {
-  --color-bg: #f7f8fa;
+  /* Surfaces: warm off-white page, white cards, cream secondary sections */
+  --color-bg: #faf8f4;
   --color-surface-1: #ffffff;
-  --color-surface-2: #eef1f5;
-  --color-border: #e2e6ec;
-  --color-border-strong: #c9cfd9;
-  --color-text: #16202b;
-  --color-muted: #5a6676;
-  --color-faint: #8b95a5;
+  --color-surface-2: #f4f0e8;
+  --color-surface-sunken: #efeadf;
+
+  /* Lines */
+  --color-border: #e8e2d7;
+  --color-border-strong: #d5ccbd;
+
+  /* Type: deep navy primary, muted gray secondary */
+  --color-text: #16233a;
+  --color-muted: #5c6779;
+  --color-faint: #8b94a3;
+
+  /* Accent */
   --color-brand: #0f5c8c;
-  --color-brand-soft: #e3eff8;
+  --color-brand-deep: #0b4569;
+  --color-brand-soft: #e7eff7;
   --color-on-brand: #ffffff;
+
   --color-accent: #0c8a6a;
-  --color-accent-soft: #e0f4ee;
-  --color-pos: #0c8a6a;
-  --color-warn: #b3730a;
-  --color-warn-soft: #fdf3e0;
-  --color-neg: #bb3a3a;
-  --color-neg-soft: #fbe9e9;
-  --color-info: #2563a8;
-  --color-info-soft: #e7f0fa;
-  --radius-lg: 16px;
+  --color-accent-soft: #e2f3ed;
+
+  /* Semantic */
+  --color-pos: #0b7a5e;
+  --color-warn: #a96a08;
+  --color-warn-soft: #fbf1de;
+  --color-neg: #b23b3b;
+  --color-neg-soft: #fae9e7;
+  --color-info: #22578f;
+  --color-info-soft: #e9f1f8;
+
+  --radius-lg: 18px;
   --radius-sm: 10px;
-  --shadow-card: 0 1px 2px rgb(22 32 43 / 0.05), 0 4px 16px rgb(22 32 43 / 0.06);
+
+  --shadow-sm: 0 1px 2px rgb(22 35 58 / 0.04);
+  --shadow-card: 0 1px 2px rgb(22 35 58 / 0.04), 0 10px 30px -18px rgb(22 35 58 / 0.16);
+  --shadow-pop: 0 2px 6px rgb(22 35 58 / 0.06), 0 18px 40px -22px rgb(22 35 58 / 0.22);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0e141b;
-    --color-surface-1: #161e28;
-    --color-surface-2: #1e2833;
-    --color-border: #263241;
-    --color-border-strong: #38475a;
-    --color-text: #e8edf3;
-    --color-muted: #9aa7b6;
-    --color-faint: #6d7a8b;
-    --color-brand: #4da3d8;
-    --color-brand-soft: #12293a;
-    --color-on-brand: #08121b;
-    --color-accent: #3fbf9a;
-    --color-accent-soft: #0f2b24;
-    --color-pos: #3fbf9a;
-    --color-warn: #dfa844;
-    --color-warn-soft: #2d2310;
-    --color-neg: #e07070;
-    --color-neg-soft: #331717;
-    --color-info: #6ea8dd;
-    --color-info-soft: #14283c;
-    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.35);
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-text);
   -webkit-tap-highlight-color: transparent;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "cv11" 1;
+  text-rendering: optimizeLegibility;
 }
+
+/* Editorial type rhythm: tighter tracking as size grows, generous leading on body */
+h1, h2, h3 {
+  letter-spacing: -0.021em;
+  text-wrap: balance;
+}
+h1 { letter-spacing: -0.03em; }
+p { text-wrap: pretty; }
 
 .card {
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   background: var(--color-surface-1);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 
+/* Subtle entrance reveals — disabled entirely under reduced motion */
+@keyframes vr-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal {
+  animation: vr-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.reveal-1 { animation-delay: 0.06s; }
+.reveal-2 { animation-delay: 0.12s; }
+.reveal-3 { animation-delay: 0.18s; }
+.reveal-4 { animation-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 @media print {
   .no-print { display: none !important; }
-  body { background: #ffffff; color: #16202b; }
+  body { background: #ffffff; color: #16233a; }
   .card { box-shadow: none; }
+}
+
+/* The app flow reads best at form width; the landing page opts into a wider
+   canvas for the hero and route grid by marking its root with [data-wide]. */
+body:has([data-wide]) .shell {
+  max-width: 64rem;
 }

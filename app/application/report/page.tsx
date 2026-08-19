@@ -7,6 +7,7 @@ import { rulesForRoute } from "@/lib/rules/seed";
 import { useApp } from "@/lib/store";
 import { SEVERITY_LABEL } from "@/lib/types";
 import { EmptyApplication, useHydrated } from "@/components/ui";
+import { Flag, type CountryCode } from "@/components/flag";
 
 export default function ReportPage() {
   const hydrated = useHydrated();
@@ -48,8 +49,11 @@ export default function ReportPage() {
       <article className="card space-y-6 p-6">
         <header className="space-y-1 border-b border-border pb-4">
           <h1 className="text-2xl font-semibold tracking-tight">Pre-Submission Readiness Report</h1>
-          <p className="text-sm text-muted">
-            {name} · {route.name} · assessed {new Date(a.ranAt).toLocaleDateString()}
+          <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <Flag country={route.country as CountryCode} className="h-3.5 w-5" />
+            <span>
+              {name} · {route.name} · assessed {new Date(a.ranAt).toLocaleDateString()}
+            </span>
           </p>
           <p className="text-xs text-faint">Engine {a.engineVersion} · rules {a.rulesVersion}</p>
         </header>

@@ -6,6 +6,8 @@ import { getRoute } from "@/lib/routes/definitions";
 import { useApp } from "@/lib/store";
 import { EmptyApplication, ScoreBar, useHydrated } from "@/components/ui";
 import { Timeline } from "@/components/timeline";
+import { RouteBadge } from "@/components/flag";
+import type { CountryCode } from "@/components/flag";
 
 export default function ApplicationDashboard() {
   const hydrated = useHydrated();
@@ -52,8 +54,12 @@ export default function ApplicationDashboard() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{route.shortName}</h1>
+      <header className="space-y-3">
+        <RouteBadge
+          country={route.country as CountryCode}
+          countryName={route.countryName}
+          routeName={route.name.split("—")[1]?.trim() ?? route.shortName}
+        />
         <p className="text-sm text-muted">
           Started {new Date(application.createdAt).toLocaleDateString()} · saved on this device
         </p>

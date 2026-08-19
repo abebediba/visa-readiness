@@ -8,6 +8,7 @@ import { getRoute } from "@/lib/routes/definitions";
 import { useApp } from "@/lib/store";
 import type { CategoryScore } from "@/lib/types";
 import { EmptyApplication, ScoreBar, SeverityBadge, useHydrated } from "@/components/ui";
+import { Flag, type CountryCode } from "@/components/flag";
 
 export default function AssessmentPage() {
   const hydrated = useHydrated();
@@ -28,7 +29,10 @@ export default function AssessmentPage() {
       <header className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Visa Readiness</h1>
-          <p className="text-sm text-muted">{route.name}</p>
+          <p className="mt-1 flex items-center gap-2 text-sm text-muted">
+            <Flag country={route.country as CountryCode} className="h-3.5 w-5" />
+            {route.name}
+          </p>
         </div>
         <button
           onClick={() => runAssessmentNow()}
