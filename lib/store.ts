@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Application, RouteId, UploadedDoc } from "./types";
+import type { Application, Outcome, RouteId, UploadedDoc } from "./types";
 import { getRoute } from "./routes/definitions";
 import { runAssessment } from "./engine/assess";
 
@@ -15,6 +15,8 @@ type State = {
   removeDocument: (id: string) => void;
   setDocumentFacts: (id: string, facts: Record<string, string>, confirmed: boolean) => void;
   runAssessmentNow: () => void;
+  markSubmitted: () => void;
+  recordOutcome: (outcome: Omit<Outcome, "recordedAt" | "scoreAtSubmission">) => void;
 };
 
 function now() {
@@ -93,6 +95,27 @@ export const useApp = create<State>()(
             updatedAt: now(),
             assessment,
             history: [...app.history, { ranAt: assessment.ranAt, overall: assessment.overall }],
+          },
+        });
+      },
+      markSubmitted: () => {
+        const app = get().application;
+        if (!app || app.submittedAt) return;
+        set({ application: { ...app, updatedAt: now(), submittedAt: now() } });
+      },
+
+      recordOutcome: (outcome) => {
+        const app = get().application;
+        if (!app) return;
+        set({
+          application: {
+            ...app,
+            updatedAt: now(),
+            outcome: {
+              ...outcome,
+              scoreAtSubmission: app.assessment?.overall,
+              recordedAt: now(),
+            },
           },
         });
       },

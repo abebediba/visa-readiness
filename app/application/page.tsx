@@ -5,6 +5,7 @@ import { ClipboardList, FileText, Gauge, MessageCircleQuestion, MessagesSquare, 
 import { getRoute } from "@/lib/routes/definitions";
 import { useApp } from "@/lib/store";
 import { EmptyApplication, ScoreBar, useHydrated } from "@/components/ui";
+import { Timeline } from "@/components/timeline";
 
 export default function ApplicationDashboard() {
   const hydrated = useHydrated();
@@ -96,6 +97,8 @@ export default function ApplicationDashboard() {
           <p className={`tabular text-xl font-semibold ${important > 0 ? "text-warn" : ""}`}>{a ? important : "—"}</p>
         </div>
       </section>
+
+      <Timeline app={application} />
 
       <nav className="card divide-y divide-border">
         {[

@@ -168,6 +168,8 @@ export type Application = {
   documents: UploadedDoc[];
   assessment?: AssessmentResult;
   history: { ranAt: string; overall: number }[];
+  submittedAt?: string;
+  outcome?: Outcome;
 };
 
 export const SEVERITY_LABEL: Record<Severity, string> = {
@@ -191,3 +193,29 @@ export function bandFor(score: number): string {
   if (score >= 50) return "Significant Weaknesses";
   return "Not Submission Ready";
 }
+
+// ---- Outcome tracking (voluntary, after the real decision) ----
+
+export type OutcomeDecision =
+  | "approved"
+  | "refused"
+  | "administrative_processing"
+  | "withdrawn"
+  | "other";
+
+export type Outcome = {
+  decision: OutcomeDecision;
+  decisionDate: string;
+  refusalReason?: string;
+  /** Overall readiness at the time the user marked the application submitted */
+  scoreAtSubmission?: number;
+  recordedAt: string;
+};
+
+export const OUTCOME_LABEL: Record<OutcomeDecision, string> = {
+  approved: "Approved",
+  refused: "Refused",
+  administrative_processing: "Administrative processing",
+  withdrawn: "Withdrawn",
+  other: "Other",
+};
