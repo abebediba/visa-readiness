@@ -96,13 +96,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="shell mx-auto w-full max-w-2xl px-4 pb-28 pt-8 sm:px-6">{children}</main>
 
         <footer className="no-print border-t border-border bg-surface-1">
-          <div className="shell mx-auto w-full max-w-2xl space-y-4 px-4 py-10 text-xs leading-relaxed text-muted sm:px-6">
-            <p className="max-w-2xl">
+          <div className="shell mx-auto w-full max-w-2xl space-y-4 px-4 py-10 text-center text-xs leading-relaxed text-muted sm:px-6">
+            <p className="mx-auto max-w-2xl">
               Visa Readiness is a free, informational self-assessment. It is not legal or immigration
               advice, it is not affiliated with any government, and it does not predict or guarantee
               any visa decision. Decisions are made solely by the relevant authorities.
             </p>
-            <nav className="flex flex-wrap gap-x-5 gap-y-1">
+            <nav className="flex flex-wrap justify-center gap-x-5 gap-y-1">
               <Link href="/legal/privacy" className="transition-colors hover:text-text">Privacy policy</Link>
               <Link href="/legal/terms" className="transition-colors hover:text-text">Terms of service</Link>
               <Link href="/legal/disclaimer" className="transition-colors hover:text-text">Disclaimer</Link>
