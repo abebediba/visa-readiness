@@ -1,4 +1,5 @@
 import type {
+  AssessmentMetrics,
   Application,
   AssessmentResult,
   CategoryScore,
@@ -168,6 +169,26 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
       : 100;
   const overall = Math.min(weighted, cap);
 
+  // ---- headline metrics ----
+  const requiredDocsAll = applicableDocs.filter((d) => d.requirement !== "recommended");
+  const providedRequired = requiredDocsAll.filter((d) => uploadedTypes.has(d.type)).length;
+  const consistencyCat = categories.find((c) => c.id === "consistency");
+  const criticalCount = findings.filter((f) => f.severity === "critical").length;
+  const importantCount = findings.filter((f) => f.severity === "important").length;
+
+  const metrics: AssessmentMetrics = {
+    sections: {
+      done: answeredRequired,
+      total: allRequired.length,
+      pct: allRequired.length ? Math.round((answeredRequired / allRequired.length) * 100) : 0,
+    },
+    consistencyPct: consistencyCat?.score ?? 100,
+    evidencePct: requiredDocsAll.length
+      ? Math.round((providedRequired / requiredDocsAll.length) * 100)
+      : 100,
+    risk: criticalCount > 0 || importantCount >= 3 ? "high" : importantCount > 0 ? "medium" : "low",
+  };
+
   return {
     engineVersion: ENGINE_VERSION,
     rulesVersion: RULES_VERSION,
@@ -179,6 +200,7 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
     missingDocuments,
     answeredRequired,
     totalRequired: allRequired.length,
+    metrics,
   };
 }
 

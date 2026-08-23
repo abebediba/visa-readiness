@@ -135,6 +135,18 @@ export type CategoryScore = {
   penalties: { code: string; title: string; severity: Severity; points: number }[];
 };
 
+export type RiskLevel = "low" | "medium" | "high";
+
+/** The four headline figures shown beside the score. All derived, none cosmetic. */
+export type AssessmentMetrics = {
+  sections: { done: number; total: number; pct: number };
+  /** How well the values agree across questionnaire and documents */
+  consistencyPct: number;
+  /** Applicable required documents actually provided */
+  evidencePct: number;
+  risk: RiskLevel;
+};
+
 export type AssessmentResult = {
   engineVersion: string;
   rulesVersion: string;
@@ -146,6 +158,7 @@ export type AssessmentResult = {
   missingDocuments: { type: string; label: string; requirement: Requirement }[];
   answeredRequired: number;
   totalRequired: number;
+  metrics: AssessmentMetrics;
 };
 
 // ---- Application state ----
