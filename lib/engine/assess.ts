@@ -131,6 +131,7 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
         id: cat.id,
         label: cat.label,
         score: null,
+        base: null,
         weight: cat.weight,
         coverage,
         coverageDetail: parts.join(" · ") || "no inputs yet",
@@ -144,6 +145,7 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
       id: cat.id,
       label: cat.label,
       score,
+      base,
       weight: cat.weight,
       coverage,
       coverageDetail: parts.join(" · ") || "consistency of everything you provided",
@@ -183,9 +185,13 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
       pct: allRequired.length ? Math.round((answeredRequired / allRequired.length) * 100) : 0,
     },
     consistencyPct: consistencyCat?.score ?? 100,
-    evidencePct: requiredDocsAll.length
-      ? Math.round((providedRequired / requiredDocsAll.length) * 100)
-      : 100,
+    documents: {
+      done: providedRequired,
+      total: requiredDocsAll.length,
+      pct: requiredDocsAll.length
+        ? Math.round((providedRequired / requiredDocsAll.length) * 100)
+        : 100,
+    },
     risk: criticalCount > 0 || importantCount >= 3 ? "high" : importantCount > 0 ? "medium" : "low",
   };
 
@@ -194,6 +200,8 @@ export function runAssessment(app: Application, route: RouteDefinition): Assessm
     rulesVersion: RULES_VERSION,
     ranAt: new Date().toISOString(),
     overall,
+    weighted,
+    cap,
     band: bandFor(overall),
     categories,
     findings: sortFindings(findings),

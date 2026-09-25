@@ -129,6 +129,9 @@ export type CategoryScore = {
   id: string;
   label: string;
   score: number | null; // null = not enough information
+  /** Score before findings were subtracted. Lets the client re-score a
+   *  what-if projection without re-deriving coverage. null when unscored. */
+  base: number | null;
   weight: number;
   coverage: number; // 0..1
   coverageDetail: string;
@@ -143,7 +146,8 @@ export type AssessmentMetrics = {
   /** How well the values agree across questionnaire and documents */
   consistencyPct: number;
   /** Applicable required documents actually provided */
-  evidencePct: number;
+  /** Required documents provided, mirroring `sections`. */
+  documents: { done: number; total: number; pct: number };
   risk: RiskLevel;
 };
 
@@ -152,6 +156,10 @@ export type AssessmentResult = {
   rulesVersion: string;
   ranAt: string;
   overall: number;
+  /** Weighted mean of the scored categories, before the severity cap. */
+  weighted: number;
+  /** Highest score the open findings allow. 100 when nothing caps it. */
+  cap: number;
   band: string;
   categories: CategoryScore[];
   findings: Finding[];

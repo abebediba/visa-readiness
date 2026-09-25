@@ -3,135 +3,130 @@
 import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import {
-  AlertTriangle, CheckCircle2, ChevronDown, ClipboardCheck, FolderCheck, Lightbulb,
-  RefreshCcw, ScanSearch, ShieldAlert, TrendingUp,
-} from "lucide-react";
 import { getRoute } from "@/lib/routes/definitions";
 import { useApp } from "@/lib/store";
-import type { AssessmentMetrics, CategoryScore, Finding, RiskLevel } from "@/lib/types";
+import { SEVERITY_LABEL, SEVERITY_PENALTY } from "@/lib/types";
+import type { AssessmentResult, CategoryScore, Finding, Severity } from "@/lib/types";
+import { SEVERITY_CAP } from "@/lib/engine/assess";
+import { projectScore, type Projection } from "@/lib/engine/project";
 import { EmptyApplication, useHydrated } from "@/components/ui";
-import { Flag, type CountryCode } from "@/components/flag";
 import { DemoBanner } from "@/components/demo-banner";
-import {
-  CATEGORY_META, DEFAULT_CATEGORY_META, TINT, findingIcon, qualityLabel, type Tint,
-} from "@/lib/ui/assessment-meta";
+import { CATEGORY_META, DEFAULT_CATEGORY_META, qualityLabel } from "@/lib/ui/assessment-meta";
 
-const RISK_COPY: Record<RiskLevel, { label: string; pill: string; classes: string; tint: Tint }> = {
-  low: { label: "Low", pill: "Looks clear", classes: "text-pos", tint: "teal" },
-  medium: { label: "Medium", pill: "Review", classes: "text-amber", tint: "amber" },
-  high: { label: "High", pill: "Needs action", classes: "text-neg", tint: "rose" },
+/** Solid severity fills. Each carries white text. */
+const SEVERITY_COLOR: Record<Severity, string> = {
+  critical: "var(--color-neg)",
+  important: "var(--color-fill-orange)",
+  review: "var(--color-info)",
+  improvement: "var(--color-muted)",
 };
+
+/** ScoreBar's thresholds, so a bar means the same thing everywhere. */
+function barColor(score: number): string {
+  if (score >= 80) return "var(--color-pos)";
+  if (score >= 65) return "var(--color-brand)";
+  if (score >= 50) return "var(--color-warn)";
+  return "var(--color-neg)";
+}
+
+type Grouping = "severity" | "area";
 
 export default function AssessmentPage() {
   const hydrated = useHydrated();
   const application = useApp((s) => s.application);
   const runAssessmentNow = useApp((s) => s.runAssessmentNow);
 
+  // What-if state, local to this screen and deliberately never persisted:
+  // marking a finding fixed is the user's assertion about what they will do,
+  // not evidence, and must not survive a reload as though the engine saw it.
+  const [fixed, setFixed] = useState<Set<string>>(new Set());
+  const [openCats, setOpenCats] = useState<Set<string>>(new Set());
+  const [grouping, setGrouping] = useState<Grouping>("severity");
+
   if (!hydrated) return null;
   if (!application) return <EmptyApplication />;
   const route = getRoute(application.routeId);
   if (!route) return <EmptyApplication />;
-
   const a = application.assessment;
-  const previous =
-    application.history.length >= 2 ? application.history[application.history.length - 2] : undefined;
+
+  const toggleFixed = (code: string) =>
+    setFixed((prev) => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code);
+      else next.add(code);
+      return next;
+    });
+
+  const rerun = () => {
+    setFixed(new Set());
+    setOpenCats(new Set());
+    runAssessmentNow();
+  };
 
   return (
-    <div className="space-y-8">
+    <div data-wide className="mx-auto flex max-w-[880px] flex-col gap-12 pt-2">
       <DemoBanner />
 
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Visa Readiness</h1>
-          <p className="mt-1.5 flex items-center gap-2 text-sm text-muted">
-            <Flag country={route.country as CountryCode} className="h-3.5 w-5" />
-            {route.name}
-          </p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-semibold text-muted">
+            {application.isDemo ? "Sample application · Ama Serwaa Boateng" : route.countryName}
+          </span>
+          <h1 className="text-[32px] font-bold leading-[1.1] tracking-[-0.03em]">
+            Readiness assessment
+          </h1>
+          <span className="text-[15px] text-muted">{route.name}</span>
         </div>
         <button
-          onClick={() => runAssessmentNow()}
-          className="flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-on-brand transition-colors hover:bg-brand-deep"
+          onClick={rerun}
+          className="rounded-md border-[1.5px] border-text bg-surface-1 px-[18px] py-2.5 text-sm font-semibold transition-colors hover:bg-text hover:text-on-brand"
         >
-          <RefreshCcw className="h-4 w-4" aria-hidden />
           {a ? "Re-run assessment" : "Run assessment"}
         </button>
       </header>
 
       {!a ? (
-        <div className="card p-6 text-muted">
+        <p className="rounded-[10px] border border-border bg-surface-1 p-6 text-muted">
           Run the assessment once you have answered the questionnaire and entered your documents&apos;
-          key details. You can re-run it as often as you like — it is deterministic: same inputs, same
-          score.
-        </div>
+          key details. You can re-run it as often as you like — it is deterministic: same inputs,
+          same score.
+        </p>
       ) : (
         <>
-          <ScorePanel
-            overall={a.overall}
-            band={a.band}
-            metrics={a.metrics}
-            engineVersion={a.engineVersion}
-            rulesVersion={a.rulesVersion}
-            answered={a.answeredRequired}
-            total={a.totalRequired}
-            previous={previous?.overall}
+          <ScorePanel result={a} fixed={fixed} />
+
+          <IssuesSection
+            result={a}
+            fixed={fixed}
+            grouping={grouping}
+            onGrouping={setGrouping}
+            onToggle={toggleFixed}
           />
 
-          <section className="space-y-3">
-            <div>
-              <h2 className="text-lg font-semibold">Why this score?</h2>
-              <p className="text-sm text-muted">
-                Tap any area to see exactly what counted and what cost points.
-              </p>
-            </div>
-            <div className="space-y-2.5">
-              {a.categories.map((c) => (
-                <CategoryRow key={c.id} category={c} />
-              ))}
-            </div>
-          </section>
+          <BreakdownSection
+            result={a}
+            fixed={fixed}
+            openCats={openCats}
+            onToggle={(id) =>
+              setOpenCats((prev) => {
+                const next = new Set(prev);
+                if (next.has(id)) next.delete(id);
+                else next.add(id);
+                return next;
+              })
+            }
+          />
 
-          <section className="space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-amber-soft">
-                <AlertTriangle className="h-[18px] w-[18px] text-amber" aria-hidden />
-              </span>
-              <div>
-                <h2 className="text-lg font-semibold">
-                  Issues found <span className="text-brand">({a.findings.length})</span>
-                </h2>
-                <p className="text-sm text-muted">
-                  Review the issues below and take the recommended actions before submitting.
-                </p>
-              </div>
-            </div>
-
-            {a.findings.length === 0 ? (
-              <div className="card flex items-center gap-3 p-5 text-sm">
-                <CheckCircle2 className="h-5 w-5 text-pos" aria-hidden />
-                <span className="text-muted">
-                  No issues detected in what you have provided so far.
-                </span>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {a.findings.map((f, i) => (
-                  <IssueCard key={`${f.code}-${i}`} finding={f} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <div className="flex flex-wrap justify-between gap-3">
+          <div className="flex flex-wrap justify-between gap-3 pt-2">
             <Link
               href="/application/documents"
-              className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:border-border-strong"
+              className="rounded-md border-[1.5px] border-text px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-text hover:text-on-brand"
             >
               Fix documents
             </Link>
             <Link
               href="/application/report"
-              className="rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-on-brand transition-colors hover:bg-brand-deep"
+              className="rounded-md bg-brand px-5 py-3 text-[15px] font-semibold text-on-brand transition-colors hover:bg-brand-deep"
             >
               View pre-submission report
             </Link>
@@ -142,245 +137,385 @@ export default function AssessmentPage() {
   );
 }
 
-function ScorePanel({
-  overall, band, metrics, engineVersion, rulesVersion, answered, total, previous,
-}: {
-  overall: number;
-  band: string;
-  metrics: AssessmentMetrics;
-  engineVersion: string;
-  rulesVersion: string;
-  answered: number;
-  total: number;
-  previous?: number;
-}) {
-  const risk = RISK_COPY[metrics.risk];
+/* ------------------------------------------------------------------ score */
+
+function ScorePanel({ result, fixed }: { result: AssessmentResult; fixed: Set<string> }) {
+  const p = projectScore(result, fixed);
+  const projecting = fixed.size > 0 && p.overall !== result.overall;
+
+  const missingRequired = result.missingDocuments.filter(
+    (d) => d.requirement !== "recommended"
+  ).length;
+  const riskNote = p.criticalCount
+    ? `${p.criticalCount} critical, ${p.importantCount} important`
+    : p.importantCount
+      ? `${p.importantCount} important`
+      : "None open";
+  const consistency = p.scores.consistency ?? result.metrics.consistencyPct;
+  const docs = result.metrics.documents;
+
+  const metrics = [
+    {
+      label: "Required answers",
+      value: `${result.metrics.sections.done}/${result.metrics.sections.total}`,
+      note: `${result.metrics.sections.pct}% complete`,
+    },
+    { label: "Data consistency", value: `${consistency}%`, note: qualityLabel(consistency) },
+    {
+      label: "Supporting evidence",
+      value: `${docs.done}/${docs.total}`,
+      note: missingRequired === 0 ? "All required documents" : `${missingRequired} missing`,
+    },
+    {
+      label: "Risk indicators",
+      value: p.risk === "low" ? "Low" : p.risk === "medium" ? "Medium" : "High",
+      note: riskNote,
+    },
+  ];
+
   return (
-    <section className="card overflow-hidden">
-      {/* Headline score */}
-      <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:gap-8">
-        <div className="shrink-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand">
-            Overall readiness
-          </p>
-          <p className="mt-1.5 font-semibold leading-none">
-            <span className="text-[4rem] tracking-tight text-brand">{overall}</span>
-            <span className="text-2xl text-faint">/100</span>
-          </p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-3.5 py-1.5 text-sm font-medium">
-              <ShieldAlert className="h-4 w-4 text-muted" aria-hidden />
-              {band}
+    <section className="overflow-hidden rounded-xl bg-fill-navy text-white">
+      <div className="grid gap-8 p-9 pb-8 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
+        <div className="flex flex-col gap-2.5">
+          <span className="text-[13px] font-semibold uppercase tracking-[0.08em] text-on-navy-muted">
+            {projecting ? "Projected readiness" : "Overall readiness"}
+          </span>
+          <p className="flex items-baseline gap-1.5">
+            <span className="tabular text-[96px] font-bold leading-[0.9] tracking-[-0.05em]">
+              {p.overall}
             </span>
-            {previous !== undefined && (
-              <span className="inline-flex items-center gap-1.5 text-sm">
-                <TrendingUp className="h-4 w-4 text-muted" aria-hidden />
-                <span className="text-muted">was {previous}</span>
-                <span className={overall >= previous ? "font-medium text-pos" : "font-medium text-neg"}>
-                  {overall >= previous ? "+" : ""}
-                  {overall - previous}
-                </span>
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="min-w-0 sm:border-l sm:border-border sm:pl-8">
-          <p className="text-sm leading-relaxed text-muted">
-            Readiness measures how <strong className="font-medium text-text">complete</strong>,{" "}
-            <strong className="font-medium text-text">consistent</strong> and{" "}
-            <strong className="font-medium text-text">well-supported</strong> your application looks.
-            It is not a probability of approval.
+            <span className="text-2xl font-semibold text-on-navy-muted">/100</span>
           </p>
-          <p className="mt-2.5 text-xs text-faint">
-            Engine {engineVersion} · rules {rulesVersion} · {answered}/{total} required answers
+          <span className="self-start rounded bg-white px-3 py-1.5 text-sm font-bold text-fill-navy">
+            {p.band}
+          </span>
+          {projecting && (
+            <span className="text-sm text-on-navy-muted">
+              Current score {result.overall}. Projection assumes the issues you marked are fixed.
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col justify-center gap-3.5">
+          <p className="text-lg font-medium leading-[1.45]">{capNote(p, result, fixed)}</p>
+          <p className="text-sm leading-relaxed text-on-navy-muted">
+            Readiness measures how complete, consistent and well-supported your application looks.
+            It is not a probability of approval.
           </p>
         </div>
       </div>
 
-      {/* Derived metrics */}
-      <div className="border-t border-border bg-surface-1/60 px-5 py-6">
-        <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-4">
-          <Metric
-            icon={ClipboardCheck}
-            tint="brand"
-            label="Sections completed"
-            value={`${metrics.sections.done}/${metrics.sections.total}`}
-            pill={`${metrics.sections.pct}%`}
-          />
-          <Metric
-            icon={ScanSearch}
-            tint="teal"
-            label="Data consistency"
-            value={`${metrics.consistencyPct}%`}
-            pill={qualityLabel(metrics.consistencyPct)}
-          />
-          <Metric
-            icon={FolderCheck}
-            tint="amber"
-            label="Supporting evidence"
-            value={`${metrics.evidencePct}%`}
-            pill={qualityLabel(metrics.evidencePct)}
-          />
-          <Metric
-            icon={ShieldAlert}
-            tint={risk.tint}
-            label="Risk indicators"
-            value={risk.label}
-            pill={risk.pill}
-            valueClass={risk.classes}
-          />
-        </div>
-        <p className="mt-6 flex items-center justify-center gap-2 text-center text-sm text-brand">
-          <Lightbulb className="h-4 w-4 shrink-0" aria-hidden />
-          Every figure here is explained in the breakdown below
-        </p>
+      <div className="grid bg-fill-navy-deep [grid-template-columns:repeat(auto-fit,minmax(150px,1fr))]">
+        {metrics.map((m) => (
+          <div
+            key={m.label}
+            className="flex flex-col gap-1 border-r border-t border-fill-navy-line px-6 py-5"
+          >
+            <span className="text-[13px] text-on-navy-muted">{m.label}</span>
+            <span className="tabular text-[26px] font-bold tracking-[-0.02em]">{m.value}</span>
+            <span className="text-[13px] text-on-navy-muted">{m.note}</span>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
 
-function Metric({
-  icon: Icon, tint, label, value, pill, valueClass,
+/** Explains the gap between the area average and the headline score. */
+function capNote(p: Projection, result: AssessmentResult, fixed: Set<string>): string {
+  if (p.cap < 100 && p.weighted > p.cap) {
+    const n = p.criticalCount || p.importantCount;
+    const word = p.criticalCount ? "critical" : "important";
+    const subject = n === 1 ? `One ${word} issue` : `${n} ${word} issues`;
+    return `Your areas average ${p.weighted}. ${subject} ${n === 1 ? "caps" : "cap"} the headline score at ${p.cap} until fixed.`;
+  }
+  if (result.findings.some((f) => !fixed.has(f.code))) {
+    return `Your areas average ${p.weighted}. Open issues still cost points in the areas they affect.`;
+  }
+  return "No open issues. The score reflects how complete your answers and documents are.";
+}
+
+/* ----------------------------------------------------------------- issues */
+
+function IssuesSection({
+  result, fixed, grouping, onGrouping, onToggle,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
-  tint: keyof typeof TINT;
-  label: string;
-  value: string;
-  pill: string;
-  valueClass?: string;
+  result: AssessmentResult;
+  fixed: Set<string>;
+  grouping: Grouping;
+  onGrouping: (g: Grouping) => void;
+  onToggle: (code: string) => void;
 }) {
+  const current = projectScore(result, fixed);
+  const openCount = result.findings.filter((f) => !fixed.has(f.code)).length;
+  const catLabel = (id: string) => result.categories.find((c) => c.id === id)?.label ?? id;
+  const order: Severity[] = ["critical", "important", "review", "improvement"];
+
+  if (result.findings.length === 0) {
+    return (
+      <section className="flex flex-col gap-5">
+        <h2 className="text-2xl font-bold tracking-[-0.02em]">Fix these before you submit</h2>
+        <p className="rounded-[10px] border border-border bg-surface-1 p-6 text-muted">
+          No issues detected in what you have provided so far.
+        </p>
+      </section>
+    );
+  }
+
+  const groups =
+    grouping === "area"
+      ? [...new Set(result.findings.map((f) => f.category))].map((id) => ({
+          key: id,
+          heading: catLabel(id),
+          items: result.findings
+            .filter((f) => f.category === id)
+            .sort((x, y) => order.indexOf(x.severity) - order.indexOf(y.severity)),
+        }))
+      : order
+          .map((sev) => ({
+            key: sev,
+            heading: SEVERITY_LABEL[sev],
+            items: result.findings.filter((f) => f.severity === sev),
+          }))
+          .filter((g) => g.items.length > 0);
+
   return (
-    <div className="flex flex-col items-center text-center">
-      <span className={clsx("grid h-11 w-11 place-items-center rounded-xl", TINT[tint].tile)}>
-        <Icon className={clsx("h-5 w-5", TINT[tint].icon)} />
-      </span>
-      <p className="mt-2.5 flex min-h-[2.6em] items-start text-xs leading-tight text-muted">
-        {label}
-      </p>
-      <p className={clsx("tabular text-xl font-semibold", valueClass ?? "text-text")}>{value}</p>
-      <p className="mt-1.5 rounded-full bg-surface-2 px-2 py-0.5 text-[11px] leading-normal text-muted">
-        {pill}
-      </p>
-    </div>
+    <section className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h2 className="text-2xl font-bold tracking-[-0.02em]">Fix these before you submit</h2>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm text-muted">
+            {openCount} of {result.findings.length} open · mark issues fixed to see the effect on
+            your score
+          </span>
+          <label>
+            <span className="sr-only">Group issues</span>
+            <select
+              value={grouping}
+              onChange={(e) => onGrouping(e.target.value as Grouping)}
+              className="rounded-md border border-border bg-surface-1 px-2 py-1 text-sm text-muted outline-none focus:border-brand"
+            >
+              <option value="severity">By severity</option>
+              <option value="area">By area</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {groups.map((g) => (
+        <div key={g.key} className="flex flex-col gap-3">
+          <div className="flex items-center gap-2.5 border-b-2 border-text pb-2">
+            <span className="text-sm font-bold uppercase tracking-[0.06em]">{g.heading}</span>
+            <span className="tabular text-sm text-muted">{g.items.length}</span>
+          </div>
+          {g.items.map((f) => (
+            <IssueCard
+              key={f.code}
+              finding={f}
+              area={catLabel(f.category)}
+              isFixed={fixed.has(f.code)}
+              currentOverall={current.overall}
+              projectedIfFixed={projectScore(result, new Set([...fixed, f.code])).overall}
+              onToggle={() => onToggle(f.code)}
+            />
+          ))}
+        </div>
+      ))}
+    </section>
   );
 }
 
-function CategoryRow({ category }: { category: CategoryScore }) {
-  const [open, setOpen] = useState(false);
-  const meta = CATEGORY_META[category.id] ?? DEFAULT_CATEGORY_META;
-  const Icon = meta.icon;
-  const tint = TINT[meta.tint];
-  const pct = category.score ?? 0;
+function IssueCard({
+  finding, area, isFixed, currentOverall, projectedIfFixed, onToggle,
+}: {
+  finding: Finding;
+  area: string;
+  isFixed: boolean;
+  currentOverall: number;
+  projectedIfFixed: number;
+  onToggle: () => void;
+}) {
+  const color = SEVERITY_COLOR[finding.severity];
+  const points = SEVERITY_PENALTY[finding.severity];
+  const capsAt =
+    finding.severity === "critical"
+      ? SEVERITY_CAP.critical
+      : finding.severity === "important"
+        ? SEVERITY_CAP.important
+        : null;
+
+  const gain = projectedIfFixed - currentOverall;
+  const impact = isFixed
+    ? "Counted as fixed in the projection above"
+    : gain > 0
+      ? `Fixing this alone: score ${currentOverall} → ${projectedIfFixed}`
+      : "Fixing this alone won't lift the headline yet";
 
   return (
-    <div className="card relative overflow-hidden">
-      <span className={clsx("absolute inset-y-0 left-0 w-1", tint.bar)} aria-hidden />
-      <button onClick={() => setOpen((o) => !o)} className="w-full px-5 py-4 pl-6 text-left">
-        <div className="flex items-center gap-4">
-          <span className={clsx("grid h-11 w-11 shrink-0 place-items-center rounded-xl", tint.tile)}>
-            <Icon className={clsx("h-5 w-5", tint.icon)} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-medium">{category.label}</span>
-            <span className="mt-0.5 block text-sm text-muted">{meta.description}</span>
-          </span>
-          <span className="hidden h-2 w-24 shrink-0 overflow-hidden rounded-full bg-surface-2 sm:block lg:w-32">
-            <span
-              className={clsx("block h-full rounded-full transition-all", tint.bar)}
-              style={{ width: `${pct}%` }}
-            />
-          </span>
-          <span className="shrink-0 text-right">
-            <span className="tabular font-semibold">
-              {category.score === null ? "—" : category.score}
-            </span>
-            <span className="text-sm text-faint">/100</span>
-          </span>
-          <ChevronDown
-            className={clsx("h-4 w-4 shrink-0 text-faint transition-transform", open && "rotate-180")}
-            aria-hidden
-          />
-        </div>
-        <span className="mt-3 block h-2 w-full overflow-hidden rounded-full bg-surface-2 sm:hidden">
-          <span className={clsx("block h-full rounded-full", tint.bar)} style={{ width: `${pct}%` }} />
+    <article
+      className={clsx(
+        "flex flex-col gap-3.5 rounded-[10px] border border-border bg-surface-1 p-6 transition-opacity",
+        isFixed && "opacity-55"
+      )}
+    >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span
+          className="rounded-[3px] px-2 py-1 text-xs font-bold uppercase tracking-[0.06em] text-white"
+          style={{ background: color }}
+        >
+          {SEVERITY_LABEL[finding.severity]}
         </span>
+        <span className="text-[13px] text-muted">{area}</span>
+        <span className="tabular ml-auto text-sm font-bold" style={{ color }}>
+          −{points} pts{capsAt ? ` · caps score at ${capsAt}` : ""}
+        </span>
+      </div>
+
+      <h3
+        className={clsx(
+          "text-[19px] font-bold leading-[1.3] tracking-[-0.015em]",
+          isFixed && "line-through"
+        )}
+      >
+        {finding.title}
+      </h3>
+      <p className="text-[15px] leading-[1.55] text-muted">{finding.detail}</p>
+
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 border-t border-border pt-3.5">
+        <span className="pt-px text-sm font-bold">What to do</span>
+        <p className="text-[15px] leading-[1.55]">{finding.recommendation}</p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          onClick={onToggle}
+          aria-pressed={isFixed}
+          className={clsx(
+            "rounded-md border-[1.5px] border-text px-3.5 py-2 text-sm font-semibold transition-colors",
+            isFixed ? "bg-text text-on-brand" : "bg-surface-1 hover:bg-text hover:text-on-brand"
+          )}
+        >
+          {isFixed ? "Marked fixed · undo" : "Mark as fixed"}
+        </button>
+        <span className="text-[13px] text-muted">{impact}</span>
+      </div>
+    </article>
+  );
+}
+
+/* -------------------------------------------------------------- breakdown */
+
+function BreakdownSection({
+  result, fixed, openCats, onToggle,
+}: {
+  result: AssessmentResult;
+  fixed: Set<string>;
+  openCats: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  const p = projectScore(result, fixed);
+
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <h2 className="text-2xl font-bold tracking-[-0.02em]">How the score is built</h2>
+        <p className="text-[15px] text-muted">
+          Each area is scored on what you provided, minus points for issues. Open an area to see
+          what counted.
+        </p>
+      </div>
+
+      <div className="overflow-hidden rounded-[10px] border border-border bg-surface-1">
+        {result.categories.map((c) => (
+          <CategoryRow
+            key={c.id}
+            category={c}
+            score={p.scores[c.id] ?? null}
+            fixed={fixed}
+            isOpen={openCats.has(c.id)}
+            onToggle={() => onToggle(c.id)}
+          />
+        ))}
+      </div>
+
+      <p className="text-[13px] text-faint">
+        Engine {result.engineVersion}. The assessment is deterministic: the same answers and
+        documents always give the same score.
+      </p>
+    </section>
+  );
+}
+
+function CategoryRow({
+  category, score, fixed, isOpen, onToggle,
+}: {
+  category: CategoryScore;
+  score: number | null;
+  fixed: Set<string>;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const meta = CATEGORY_META[category.id] ?? DEFAULT_CATEGORY_META;
+
+  return (
+    <div className="border-t border-border first:border-t-0">
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="grid w-full grid-cols-[minmax(0,1fr)_44px_14px] items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-surface-2 sm:grid-cols-[minmax(0,1fr)_minmax(60px,180px)_44px_14px]"
+      >
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span className="text-[15px] font-semibold">{category.label}</span>
+          <span className="text-[13px] text-muted">
+            {meta.description} · {Math.round(category.weight * 100)}% of score
+          </span>
+        </span>
+        <span className="hidden h-2 overflow-hidden rounded-sm bg-surface-sunken sm:block">
+          {score !== null && (
+            <span
+              className="block h-full transition-all"
+              style={{ width: `${score}%`, background: barColor(score) }}
+            />
+          )}
+        </span>
+        <span
+          className={clsx(
+            "tabular text-right text-lg font-bold",
+            score !== null && score < 50 ? "text-neg" : "text-text"
+          )}
+        >
+          {score === null ? "—" : score}
+        </span>
+        <span className="text-center text-lg text-faint">{isOpen ? "−" : "+"}</span>
       </button>
 
-      {open && (
-        <div className="space-y-2 border-t border-border px-6 py-4 text-sm">
+      {isOpen && (
+        <div className="flex flex-col gap-2.5 px-5 pb-5 pt-1 text-sm">
           <p className="text-muted">
             <strong className="text-text">Evidence considered:</strong> {category.coverageDetail}
             {category.score === null && " — not enough information to score this area yet."}
           </p>
           {category.penalties.length > 0 ? (
-            <ul className="space-y-1">
-              {category.penalties.map((p, i) => (
-                <li key={`${p.code}-${i}`} className="flex items-center justify-between gap-3">
-                  <span className="text-muted">{p.title}</span>
-                  <span className="tabular shrink-0 font-medium text-neg">−{p.points}</span>
-                </li>
-              ))}
-            </ul>
+            category.penalties.map((pen) => {
+              const done = fixed.has(pen.code);
+              return (
+                <div
+                  key={pen.code}
+                  className={clsx(
+                    "grid grid-cols-[48px_minmax(0,1fr)] gap-2",
+                    done ? "text-faint line-through" : "text-neg"
+                  )}
+                >
+                  <span className="tabular font-bold">−{pen.points}</span>
+                  <span>{pen.title}</span>
+                </div>
+              );
+            })
           ) : (
             <p className="text-muted">No issues reduced this area.</p>
           )}
-          <p className="text-xs text-faint">
-            Weight in overall score: {Math.round(category.weight * 100)}%
-          </p>
         </div>
       )}
     </div>
-  );
-}
-
-const SEVERITY_STYLE = {
-  critical: { edge: "bg-neg", tile: "bg-neg-soft", icon: "text-neg", pill: "bg-neg-soft text-neg", panel: "bg-neg-soft", heading: "text-neg" },
-  important: { edge: "bg-amber", tile: "bg-amber-soft", icon: "text-amber", pill: "bg-amber-soft text-amber", panel: "bg-amber-soft", heading: "text-amber" },
-  review: { edge: "bg-info", tile: "bg-info-soft", icon: "text-info", pill: "bg-info-soft text-info", panel: "bg-info-soft", heading: "text-info" },
-  improvement: { edge: "bg-border-strong", tile: "bg-surface-2", icon: "text-muted", pill: "bg-surface-2 text-muted", panel: "bg-surface-2", heading: "text-muted" },
-} as const;
-
-const SEVERITY_LABEL = {
-  critical: "Critical",
-  important: "Important",
-  review: "Review",
-  improvement: "Improvement",
-} as const;
-
-function IssueCard({ finding }: { finding: Finding }) {
-  const s = SEVERITY_STYLE[finding.severity];
-  const Icon = findingIcon(finding.code, finding.category);
-
-  return (
-    <article className="card relative overflow-hidden">
-      <span className={clsx("absolute inset-y-0 left-0 w-1.5", s.edge)} aria-hidden />
-      <div className="flex gap-4 p-5 pl-6">
-        <span className={clsx("grid h-11 w-11 shrink-0 place-items-center rounded-full", s.tile)}>
-          <Icon className={clsx("h-5 w-5", s.icon)} />
-        </span>
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="space-y-2">
-            <h3 className="font-semibold leading-snug">{finding.title}</h3>
-            <span
-              className={clsx(
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
-                s.pill
-              )}
-            >
-              <span className={clsx("h-1.5 w-1.5 rounded-full", s.edge)} />
-              {SEVERITY_LABEL[finding.severity]}
-            </span>
-          </div>
-          <p className="text-sm leading-relaxed text-muted">{finding.detail}</p>
-          <div className={clsx("flex gap-3 rounded-[var(--radius-sm)] p-3.5", s.panel)}>
-            <Lightbulb className={clsx("mt-0.5 h-4 w-4 shrink-0", s.icon)} aria-hidden />
-            <div>
-              <p className={clsx("text-sm font-semibold", s.heading)}>Recommended action</p>
-              <p className="mt-1 text-sm leading-relaxed text-text/85">{finding.recommendation}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
   );
 }

@@ -3,6 +3,8 @@ import { test } from "node:test";
 import type { Application, RouteId, UploadedDoc } from "../lib/types";
 import { getRoute } from "../lib/routes/definitions";
 import { runAssessment } from "../lib/engine/assess";
+import { projectScore } from "../lib/engine/project";
+import { buildDemoApplication } from "../lib/demo";
 
 let seq = 0;
 function doc(type: string, facts: Record<string, string>): UploadedDoc {
@@ -200,4 +202,59 @@ test("an important finding keeps the score out of the 'very strong' band", () =>
   const result = assess(app);
   assert.ok(result.findings.some((f) => f.severity === "important"));
   assert.ok(result.overall <= 79, `important case scored ${result.overall}, expected <= 79`);
+});
+
+// ---- what-if projection ----------------------------------------------------
+
+test("projection with nothing fixed reproduces the assessment exactly", () => {
+  const app = buildDemoApplication();
+  const result = assess(app);
+  const p = projectScore(result, new Set());
+
+  assert.equal(p.overall, result.overall);
+  assert.equal(p.weighted, result.weighted);
+  assert.equal(p.cap, result.cap);
+  assert.equal(p.band, result.band);
+  for (const cat of result.categories) {
+    assert.equal(p.scores[cat.id], cat.score, `category ${cat.id}`);
+  }
+});
+
+test("projection matches a real re-run: fixing everything lifts the cap to 100", () => {
+  const app = buildDemoApplication();
+  const result = assess(app);
+  assert.ok(result.cap < 100, "demo fixture is capped");
+
+  const all = new Set(result.findings.map((f) => f.code));
+  const p = projectScore(result, all);
+
+  assert.equal(p.cap, 100, "no open findings means no cap");
+  assert.equal(p.criticalCount, 0);
+  assert.equal(p.importantCount, 0);
+  assert.equal(p.risk, "low");
+  // With every penalty removed each category returns to its pre-penalty base,
+  // which is what a genuine re-run on corrected inputs would produce.
+  for (const cat of result.categories) {
+    assert.equal(p.scores[cat.id], cat.base, `category ${cat.id} returns to base`);
+  }
+});
+
+test("clearing only the critical finding moves the cap from 55 to 79", () => {
+  const app = buildDemoApplication();
+  const result = assess(app);
+  const critical = result.findings.filter((f) => f.severity === "critical");
+  assert.ok(critical.length > 0, "demo fixture has a critical finding");
+  assert.equal(result.cap, 55);
+
+  const p = projectScore(result, new Set(critical.map((f) => f.code)));
+  assert.equal(p.cap, 79, "an important finding is still open");
+  assert.ok(p.overall >= result.overall, "resolving a critical never lowers the score");
+});
+
+test("projection is pure: it never mutates the assessment it is given", () => {
+  const app = buildDemoApplication();
+  const result = assess(app);
+  const before = JSON.stringify(result);
+  projectScore(result, new Set(result.findings.map((f) => f.code)));
+  assert.equal(JSON.stringify(result), before);
 });

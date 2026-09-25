@@ -3,4 +3,4 @@
  * their own role addresses (privacy@, legal@) because those identify the data
  * controller; this is the general enquiries mailbox.
  */
-export const CONTACT_EMAIL = "hello@inspiredmediaglobal.com";
+export const CONTACT_EMAIL = "hello@visareadiness.com";

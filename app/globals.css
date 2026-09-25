@@ -51,6 +51,12 @@
   --color-fill-orange: #a34d09;
   --color-fill-purple: #55299a;
 
+  /* Navy panel interior: the metrics strip, its rules, and type that has to sit
+     back from white on the navy. */
+  --color-fill-navy-deep: #16304d;
+  --color-fill-navy-line: #2a4a70;
+  --color-on-navy-muted: #c9d6e6;
+
   /* Semantic */
   --color-pos: #0b7a5e;
   --color-warn: #a96a08;
