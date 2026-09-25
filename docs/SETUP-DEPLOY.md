@@ -13,11 +13,22 @@ The Vercel project **exists**:
 |---|---|
 | Team | **Inspired** (`team_4ifOeBhVe37OvDKF5QtWaUif`) |
 | Project | **visa-readiness** (`prj_uMWC7Zfkl1AcUnzSH58IbKOnclEY`) |
-| Git link | **not connected** |
-| Deployments | none yet |
-| Domains | none yet |
+| Git link | `abebediba/visa-readiness`, production branch `main` |
+| Deployments | live, auto-deploying on push |
+| Domains | `www.visareadiness.com` (primary), apex 308-redirects to it |
+| Environment variables | **none set** |
 
-It was created through the API, but every write to it after creation is
+The live DNS, registered at Hostinger and verified from outside:
+
+| Type | Name | Value |
+|---|---|---|
+| `A` | `@` | `216.198.79.1` |
+| `CNAME` | `www` | `df755aae6ef48b7f.vercel-dns-017.com` |
+
+DNS stayed at Hostinger rather than delegating nameservers to Vercel, so `MX`
+records for mail on this domain are added there too.
+
+The project was created through the API, but every write to it after creation is
 refused — linking the repository, setting environment variables and creating a
 deployment all come back `403 You don't have permission to create a Production
 Deployment for this project` or `404 Project not found`. The API connection can
