@@ -40,6 +40,13 @@
   --color-rose: #b4416a;
   --color-rose-soft: #fae5ec;
 
+  /* Solid card fills — saturated panels that carry white type. Darker than the
+     accent family above, which is tuned for icons and text on light surfaces. */
+  --color-fill-navy: #1d3a5c;
+  --color-fill-teal: #0d7360;
+  --color-fill-orange: #a34d09;
+  --color-fill-purple: #55299a;
+
   /* Semantic */
   --color-pos: #0b7a5e;
   --color-warn: #a96a08;

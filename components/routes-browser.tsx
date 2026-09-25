@@ -33,8 +33,7 @@ export function RoutesBrowser() {
 
   return (
     <div className="space-y-5">
-      {/* Toolbar: quick country chips on wide screens, a select on narrow ones,
-          plus free-text search over route names and descriptions. */}
+      {/* Toolbar: quick country chips on wide screens, a select on narrow ones. */}
       <div className="space-y-3">
         <div className="hidden flex-wrap items-center gap-2 sm:flex">
           <Chip active={country === "all"} onClick={() => reset(() => setCountry("all"))}>
@@ -69,35 +68,36 @@ export function RoutesBrowser() {
         </label>
       </div>
 
-      {/* Results */}
+      {/* Results — a two-up grid of tiles, so a route reads as a card you pick
+          rather than a row in a table. */}
       {visible.length === 0 ? (
-        <div className="card p-8 text-center">
+        <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-8 text-center">
           <p className="font-medium">No routes for that country yet.</p>
           <p className="mt-1 text-sm text-muted">
             Five routes are supported today. More countries are added as configuration.
           </p>
           <button
             onClick={() => reset(() => setCountry("all"))}
-            className="mt-4 rounded-full border border-border px-4 py-2 text-sm font-medium"
+            className="mt-4 rounded-full border border-border bg-surface-1 px-4 py-2 text-sm font-medium"
           >
             Show all routes
           </button>
         </div>
       ) : (
-        <ul className="card divide-y divide-border overflow-hidden">
+        <ul className="grid gap-3 sm:grid-cols-2">
           {visible.map((route) => (
             <li key={route.id}>
               <Link
                 href="/start"
-                className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2/60"
+                className="group flex h-full items-start gap-4 rounded-[var(--radius-lg)] border border-border bg-surface-2/50 p-5 transition-colors hover:border-brand/40 hover:bg-surface-1"
               >
-                <Flag country={route.country as CountryCode} className="h-6 w-9" />
+                <Flag country={route.country as CountryCode} className="mt-0.5 h-7 w-10 shrink-0" />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-xs uppercase tracking-[0.07em] text-faint">
+                  <span className="block text-[11px] uppercase tracking-[0.09em] text-faint">
                     {route.countryName}
                   </span>
-                  <span className="mt-0.5 flex flex-wrap items-center gap-2">
-                    <span className="font-medium">
+                  <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="font-medium leading-snug">
                       {route.name.split("—")[1]?.trim() ?? route.shortName}
                     </span>
                     <span
@@ -111,10 +111,12 @@ export function RoutesBrowser() {
                       {route.kind === "study" ? "Study" : "Visitor"}
                     </span>
                   </span>
-                  <span className="mt-0.5 block text-sm text-muted">{route.tagline}</span>
+                  <span className="mt-1.5 block text-sm leading-relaxed text-muted">
+                    {route.tagline}
+                  </span>
                 </span>
                 <ArrowRight
-                  className="h-4 w-4 shrink-0 text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand"
                   aria-hidden
                 />
               </Link>
