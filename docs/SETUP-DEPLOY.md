@@ -5,39 +5,36 @@ The app is a Next.js server application. Its three AI endpoints (`/api/extract`,
 server app — not as a static export. Vercel does this by default; nothing in the
 repo needs changing.
 
-## 1. Connect the repository (one-time — only you can do this)
+## 1. Project status, and what is left to do by hand
 
-**This is the one step that is currently blocking the Vercel deployment.**
-Creating the project from here fails with:
+The Vercel project **exists**:
 
-> To link a GitHub repository, you need to install the GitHub integration first.
+| | |
+|---|---|
+| Team | **Inspired** (`team_4ifOeBhVe37OvDKF5QtWaUif`) |
+| Project | **visa-readiness** (`prj_uMWC7Zfkl1AcUnzSH58IbKOnclEY`) |
+| Git link | **not connected** |
+| Deployments | none yet |
+| Domains | none yet |
 
-The Vercel team is **Inspired** (`team_4ifOeBhVe37OvDKF5QtWaUif`). Installing the
-Vercel app on your personal GitHub account is not enough on its own — the
-installation has to grant access to this specific repository, and the Vercel
-team has to be connected to that GitHub account.
+It was created through the API, but every write to it after creation is
+refused — linking the repository, setting environment variables and creating a
+deployment all come back `403 You don't have permission to create a Production
+Deployment for this project` or `404 Project not found`. The API connection can
+read the project and not change it, so the remaining steps have to be done in
+the dashboard by someone with Member or Owner rights on the team.
 
-1. Go to https://github.com/settings/installations → **Vercel** → **Configure**.
-2. Under *Repository access*, either choose **All repositories**, or **Only
-   select repositories** and add `abebediba/visa-readiness`. Save.
-3. In Vercel, switch to the **Inspired** team, then **Add New → Project →
-   Import** `abebediba/visa-readiness`.
-   - Framework preset: **Next.js** (detected automatically)
-   - Root directory: **`.`** (the repo root — this is a standalone repo)
-   - Build command / output: leave as detected
-4. Tell me when that is done and I can finish the setup (env vars, domain)
-   through the Vercel API without you clicking through the rest.
+Open the project at **vercel.com → Inspired → visa-readiness**, then:
 
-If step 2 does not list the repository at all, the Vercel app is installed on a
-different GitHub account than the one that owns it.
-
-### Alternative: deploy without the GitHub link
-
-If you would rather not connect GitHub, create a Vercel access token at
-https://vercel.com/account/tokens and add it to this project's environment as
-`VERCEL_TOKEN`. That lets the deployment be driven from the command line
-instead. You lose automatic deploys on push, which is the main reason to prefer
-the GitHub link.
+1. **Settings → Git → Connect Git Repository** → `abebediba/visa-readiness`.
+   Production branch: `main`.
+2. **Settings → Environment Variables** — see the table in section 2 below.
+3. **Settings → Deployment Protection** — Vercel Authentication is currently on
+   for *all deployments except custom domains*. That is a sensible default, but
+   until the custom domain is attached it means the `*.vercel.app` URL asks
+   every visitor to log in to Vercel. If you want to share the deployment before
+   the domain is live, turn it off here.
+4. **Deployments → Redeploy**, or just push to `main` once step 1 is done.
 
 ## 2. Environment variables
 
