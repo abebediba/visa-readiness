@@ -40,6 +40,10 @@
   --color-rose: #b4416a;
   --color-rose-soft: #fae5ec;
 
+  /* Brand mark. Its own token: the logo blue is more saturated than the product
+     brand colour and is used only for the mark. */
+  --color-logo: #2859df;
+
   /* Solid card fills — saturated panels that carry white type. Darker than the
      accent family above, which is tuned for icons and text on light surfaces. */
   --color-fill-navy: #1d3a5c;

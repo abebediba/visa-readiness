@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { FolderOpen } from "lucide-react";
 import { CloudSync } from "@/components/cloud-sync";
+import { Logo } from "@/components/logo";
 import { BackdropAmbience } from "@/components/backdrop";
 import "./globals.css";
 
@@ -50,13 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BackdropAmbience />
         <header className="no-print sticky top-0 z-30 border-b border-border/80 bg-bg/85 backdrop-blur-md">
           <div className="shell mx-auto flex h-16 w-full max-w-2xl items-center justify-between gap-4 px-4 sm:px-6">
-            <Link href="/" className="flex shrink-0 items-center gap-2.5">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand text-[13px] font-semibold text-on-brand">
-                V
-              </span>
-              <span className="whitespace-nowrap text-[15px] font-semibold tracking-tight">
-                Visa Readiness
-              </span>
+            <Link href="/" aria-label="Visa Readiness — home">
+              <Logo className="flex shrink-0 items-center gap-2.5" />
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <Link
