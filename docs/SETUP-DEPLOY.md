@@ -91,6 +91,42 @@ Note: moving nameservers to Vercel moves **all** DNS for that domain, including
 `MX` records. If email for the domain is already live, re-create the mail
 records in Vercel's DNS first, or use the records-only option above.
 
+### Pointing a Hostinger domain at Vercel
+
+Buy the domain only — a hosting plan is not needed, since Vercel serves the
+site. Then, in Vercel: **Project → Settings → Domains → Add**, enter the domain,
+and Vercel will show the records it wants. Then either:
+
+**Keep DNS at Hostinger (recommended if the domain also carries mail).**
+hPanel → **Domains → [domain] → DNS / Nameservers → DNS records**.
+
+| Type | Name | Points to | TTL |
+|---|---|---|---|
+| `A` | `@` | `76.76.21.21` | default |
+| `CNAME` | `www` | `cname.vercel-dns.com` | default |
+
+**Delete Hostinger's existing `@` and `www` records first.** A fresh Hostinger
+domain ships with parking records, and leaving them in place means two `A`
+records for the apex: requests round-robin between Vercel and the parking page,
+and the TLS certificate fails to issue intermittently. Edit or remove, do not
+just add alongside.
+
+**Or hand DNS to Vercel.** In hPanel → **Domains → [domain] → DNS /
+Nameservers**, choose *Change nameservers* and enter the two Vercel shows
+(`ns1.vercel-dns.com`, `ns2.vercel-dns.com`). Simpler, and Vercel then manages
+every record — but it moves `MX` too, so any mail on that domain stops until the
+mail records are recreated in Vercel's DNS.
+
+Use the values Vercel prints for your project if they differ from the table
+above; those are the current defaults and Vercel does change them.
+
+Propagation is usually minutes, up to a few hours. Vercel issues the TLS
+certificate by itself once the records resolve.
+
+Afterwards, set `NEXT_PUBLIC_SITE_URL` to the new origin and redeploy — it
+drives the canonical URL and the link previews, and a stale value means every
+shared link previews the wrong host.
+
 ## 4. Retire the GitHub Pages demo
 
 Once Vercel serves the site, `.github/workflows/pages.yml` is redundant and will
